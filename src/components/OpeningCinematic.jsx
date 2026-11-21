@@ -198,7 +198,7 @@ export function OpeningCinematic({ onComplete }) {
             💖
           </div>
           <p style={{ fontFamily: 'var(--font-retro)', fontSize: 11, color: '#93c5fd', lineHeight: 1.8, maxWidth: 360 }}>
-            Menyiapkan sesuatu yang spesial untuk seseorang yang paling istimewa...
+            Tunggu bentar, masih loading ya udyy sayang...
           </p>
         </div>
       )}
