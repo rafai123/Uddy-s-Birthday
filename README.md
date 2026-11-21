@@ -1,81 +1,67 @@
-# 🗡️ Dunia Kenangan Kita - Retro Game Edition (Forgotten Warrior Style)
-### Spesial Perayaan Ulang Tahun ke-24 untuk Sayang ❤️ (26 November 2026)
+# ⚔️ Dunia Kenangan Kita - Final Fantasy Birthday Edition
+### Spesial Perayaan Ulang Tahun ke-24 untuk Udy ❤️ (26 November 2026)
 
-Aplikasi web interaktif bertema retro game klasik (estetika petualangan 16-bit ala *Forgotten Warrior* / game Java J2ME), dibangun sepenuhnya berdasarkan dokumen desain UX & tata letak peta [a_detailed_infographic_ux_design_document_layout_o.png](a_detailed_infographic_ux_design_document_layout_o.png).
+Aplikasi web interaktif bertema **Final Fantasy Classic RPG (SNES/PS1 Golden Era)**, dibangun ulang sepenuhnya menggunakan **React.js + Vite** dan siap di-deploy langsung ke **Vercel**.
 
 ---
 
-## ✨ Fitur Utama & Pembaruan
+## 🌟 Pembaruan & Fitur Utama (Revamped)
 
-### 1. 🎨 Grafis Retro 16-Bit Ala Forgotten Warrior
-- **Visual Retro Nostalgia**: Desain visual klasik dengan tekstur ubin lanskap, bebatuan kuno, danau Danau Toba dengan riak ombak animasi, perahu kayu dermaga Samosir, bukit Sinabung, pantai pasir keemasan, lembah asri desa Meat, dan tebing megah Tongging.
-- **Efek Partikel Alam Romantis**: Hembusan kelopak bunga sakura merah muda (*cherry blossom*), partikel hati melayang (*floating romantic hearts*), dan kunang-kunang malam yang bersinar lembut di atas danau.
-- **Tata Cahaya Obor & Lentera**: Obor kuno (*torchlights*) berkedip dengan pendar cahaya hangat di sepanjang jalur batu setapak.
+### 1. ⚔️ Estetika Final Fantasy Classic
+- **Iconic Blue Gradient Windows**: Jendela dialog dan menu bergaya khas Final Fantasy (gradasi biru tua royal dengan border perak ganda dan sudut ornamen emas).
+- **Status Bar & Kristal Memori**: Profil karakter menampilkan *Udy ❤️ (HP 1126/1126, MP 24/24)* melambangkan tanggal lahir 26 November dan usia ke-24, serta 5 permata kristal suci.
+- **Peta Petualangan Lebih Detail**:
+  - Danau Toba dengan kedalaman gradasi biru tua, riak ombak bergerak, dan pantulan kilau air.
+  - Perbukitan Sinabung dengan lereng batuan berlapis dan kabut puncak.
+  - Pesisir Pantai dengan gulungan ombak transparan dan pasir keemasan.
+  - Lembah pedesaan Meat yang asri dengan petak sawah hijau.
+  - Tebing Tongging megah dengan panorama ketinggian.
+  - Pulau Bintang terapung **"Our Little Universe"** dihiasi partikel kosmik dan portal kristal.
 
-### 2. 🧕 Karakter Pemain Sesuai Foto Kekasih
-- Karakter pixel art perempuan imut yang dirancang khusus menyerupai foto asli sang kekasih:
-  - Mengenakan **jilbab pashmina hitam rapi**.
-  - **Kacamata bulat berbingkai emas** yang khas dan manis.
-  - Wajah manis dengan senyum hangat dan rona pipi (*blush*).
-  - Pakaian petualang hoodie/jaket elegan dan celana santai.
-  - Animasi berjalan 4 arah (Depan, Belakang, Kiri, Kanan) dengan langkah kaki halus.
-  - **Avatar Portrait 16-Bit** berbingkai ganda kayu & emas retro di sudut HUD atas.
+### 2. 🚶‍♀️ Kecepatan Berjalan Karakter Diperlambat (Lebih Anggun & Tenang)
+- Kecepatan berjalan karakter diturunkan dari 3.6 menjadi **1.85**. Karakter melangkah dengan tenang, santai, dan anggun, memberikan rasa eksplorasi RPG yang syahdu dan romantis.
 
-### 3. 📱 Dioptimalkan Penuh untuk Tampilan & Sentuhan Android
-- **Virtual D-Pad / Joystick**: Thumb stick analog responsif di pojok kiri bawah layar, dirancang khusus untuk jempol satu tangan di HP.
-- **Tombol Aksi [A] Retro**: Tombol arkade tactile besar di kanan bawah dengan efek tekan, pendar cahaya saat dekat lokasi, dan getaran haptic feedback (`vibrate`) di Android.
-- **Tap-to-Walk**: Bisa langsung mengetuk area mana pun di peta layar sentuh untuk membuat karakter berjalan ke titik tersebut dengan penanda hati berkilau.
-- **Tanpa Python di Website**: 100% menggunakan teknologi web murni JavaScript/HTML5 modern tanpa ketergantungan runtime Python.
+### 3. 🚫 Tanpa Kata-kata "AI Slop" (Singkat, Tulus, Natural & Romantis)
+- Seluruh teks puitis generik AI telah dihapus sepenuhnya.
+- Setiap foto momen kini dilengkapi **1 kalimat pendek yang jujur, hangat, dan nyata** (misal: *"Senyum favoritku di tepi danau"*, *"Dinginnya kabut, tapi hangat ada kamu"*, *"Matahari sore mulai keemasan"*).
+- Tidak ada paragraf panjang yang membosankan saat melihat-lihat foto.
 
-### 4. 🖼️ Model Scroll Album Foto & Optimasi Ukuran (Super Ringan)
-- **Kompresi Pintar 95.2%**: 58 foto momen perjalanan yang awalnya berukuran total **253.6 MB** telah dioptimalkan secara cerdas menjadi hanya **12.14 MB** (menghemat ~95% bandwidth dan memori HP Android sehingga tidak akan lag ataupun force close).
-- **Model Scroll Reel**: Foto-foto ditampilkan dalam format gulungan horizontal (*horizontal scroll reel*) dengan gestur usap (*touch swipe*), magnetik *scroll-snap*, kartu momen vintage, dan tombol navigasi [◀ Prev] [Next ▶].
-- **Filmstrip Thumbnail**: Strip pratinjau thumbnail instan di bagian bawah album untuk melompat langsung ke momen tertentu.
-- **Fullscreen Lightbox**: Ketuk foto mana pun untuk melihat tampilan penuh yang jernih.
+### 4. 🧕 Karakter Pemain Sesuai Foto Asli
+- Sprite pixel art chibi Final Fantasy:
+  - Jilbab pashmina hitam rapi.
+  - Kacamata bulat bingkai emas yang manis.
+  - Senyum hangat berseri dengan rona pipi (*blush* pink).
+  - Pakaian petualang elegan dengan aksen bros kristal.
+  - Animasi melangkah 4 arah yang halus.
+  - Avatar portrait 16-bit berbingkai biru klasik Final Fantasy pada HUD.
 
-### 5. 🎵 Musik Latar Romantis Retro (Synthesizer Web Audio API)
-- Musik latar romantis nostalgia yang disintesis langsung menggunakan Web Audio API (suara celesta/music box manis, melodi suling retro dengan vibrato romantis, dan petikan nada akustik hangat).
-- Berjalan 100% offline tanpa perlu mengunduh file MP3 besar.
-- Dilengkapi tombol toggle cepat `[🎵 Musik: ON/OFF]` di HUD atas.
-- Efek Suara Retro (SFX): Langkah kaki, tiupan angin lilin, kembang api boom, dan denting melodi penemuan kenangan.
+### 5. 🎵 Soundtrack & SFX Ikonik Final Fantasy
+- Melodi romantis bergaya *Prelude / Theme of Love* yang disintesis langsung menggunakan Web Audio API murni.
+- Dilengkapi efek suara retro: *cursor beep* klasik, *window confirm sound*, *crystal fanfare*, *candle blow*, dan *fireworks boom*.
 
-### 6. 🎂 Alur Pembuka Sinematik 5 Tahap (10–15 Detik)
-1. **01 Romantic Loading**: Layar gelap bertabur bintang dengan detak hati berdenyut bercahaya (*pulsing heart*).
-2. **02 Fireworks Celebration**: Pesta kembang api retro warna-warni menyinari malam.
-3. **03 Birthday Reveal**: Tulisan emas berkilau: *"Selamat Ulang Tahun ke-24, Sayang ❤️ - 26 NOVEMBER 2026"*.
-4. **04 Kue & 24 Lilin Interaktif**:
-   - Pilihan: **[Tiup Lilin 🎂]** atau **[Jelajahi Dunia Kita ✨]**.
-   - Hembusan angin sejuk meniup padam ke-24 lilin satu per satu dengan efek kepulan asap dan suara desis.
-   - Ledakan confetti penuh warna dan kartu pesan cinta yang tulus.
-5. **05 Transition to World**: Portal bintang pusaran spiral kosmik mengantarkan ke dunia permainan.
-*(Tersedia tombol "Lewati Intro ⏩" di pojok kanan atas kapan saja).*
-
-### 7. 🌌 Area Rahasia: "Our Little Universe"
-- Terletak di pulau kosmik terapung di bagian paling bawah peta.
-- Terkunci dengan gembok misterius hingga kelima lokasi kenangan selesai ditemukan.
-- Setelah terbuka, menampilkan surat cinta yang panjang dan menyentuh hati serta pesta kembang api spektakuler tanpa henti!
+### 6. 📱 Dioptimalkan Khusus untuk Android & Chrome Mobile
+- **Virtual Analog D-Pad & Tombol [A]**: Mudah dikendalikan dengan dua jempol di HP Android.
+- **Model Scroll Album**: Gulungan foto horizontal (*horizontal scroll reel*) super ringan, didukung gestur geser usap (*swipe*), *scroll-snap*, kartu momen, dan tombol navigasi [◀ Prev] [Next ▶].
+- **Kompresi Foto 95.2%**: Foto sangat ringan (~150KB), bebas lag dan tidak membebani RAM 6GB / chipset Helio G90T.
 
 ---
 
 ## 🚀 Cara Menjalankan
 
-### Cara Paling Mudah (Windows):
-Cukup **klik dua kali file `start.bat`**.
-Script ini otomatis memprioritaskan server modern berbasis Node.js (`server.js`) dan langsung membuka browser Anda di `http://localhost:8080`.
+### Cara Paling Mudah di Komputer:
+Cukup klik dua kali **`start.bat`**. Browser akan otomatis terbuka di `http://localhost:8080`.
 
-### Melalui Terminal / Command Prompt:
+### Melalui Terminal:
 ```bash
-node server.js
+npm run dev
 ```
-atau
-```bash
-npm start
-```
-Buka browser di: **http://localhost:8080**
 
-### Untuk Membuka di HP Android:
-Pastikan HP Android dan laptop/komputer terhubung ke jaringan Wi-Fi yang sama, lalu buka alamat IP komputer Anda di browser Android (misal: `http://192.168.1.xxx:8080`).
+### Build Produksi untuk Vercel:
+```bash
+npm run build
+```
+Otomatis menghasilkan bundle statis super cepat di folder `dist/` yang langsung didukung oleh Vercel.
 
 ---
 
-Dibuat dengan segenap cinta untuk merayakan hari paling istimewa sang kekasih. ❤️✨
+Dibuat dengan segenap cinta untuk merayakan ulang tahun ke-24 Udy tercinta. ❤️✨

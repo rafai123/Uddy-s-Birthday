@@ -1,23 +1,13 @@
 @echo off
-title Dunia Kenangan Kita - Ulang Tahun ke-24 (Retro Forgotten Warrior Style)
+title Dunia Kenangan Kita - Final Fantasy Birthday Edition
 echo ========================================================
 echo   Selamat Ulang Tahun ke-24, Sayang! ❤️
-echo   Dunia Kenangan Kita - Retro Game Edition
+echo   Final Fantasy Retro Edition (React + Vite)
 echo ========================================================
 echo.
 
-REM Prioritas 1: Gunakan Node.js (Tanpa Python)
-node -v >nul 2>&1
-if %ERRORLEVEL% EQU 0 (
-    echo [OK] Menjalankan server JavaScript modern via Node.js...
-    start "" http://localhost:8080
-    node server.js
-    goto end
-)
+REM Jalankan Vite dev server pada port 8080
+start "" http://localhost:8080
+npm run dev -- --host 0.0.0.0 --port 8080
 
-REM Prioritas 2: Fallback buka langsung index.html di browser
-echo Node.js tidak ditemukan, membuka langsung index.html di peramban...
-start "" index.html
-
-:end
 pause

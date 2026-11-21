@@ -1,13 +1,20 @@
 {
-  "name": "ultah-udy-retro",
-  "version": "2.0.0",
-  "description": "Dunia Kenangan Kita - Ulang Tahun ke-24 Udy (Retro Forgotten Warrior Style)",
-  "main": "server.js",
+  "name": "uddy-birthday-final-fantasy",
+  "private": true,
+  "version": "3.0.0",
+  "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "vite --host 0.0.0.0 --port 8080"
   },
-  "keywords": ["retro-game", "birthday", "pixel-art", "javascript"],
-  "author": "rafai",
-  "license": "MIT"
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.7"
+  }
 }
