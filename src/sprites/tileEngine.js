@@ -1,110 +1,188 @@
-// Engine Tile 8-Bit / 16-Bit Klasik Final Fantasy & Chrono Trigger
-// Ukuran Blok: 32x32 pixel (1 Meter = 1 Blok)
-// Tekstur Rumput Kaya Pola, Batu Berundak, Ombak Pantai, Pasir & Tebing Bergradasi
+// Engine Grafis 24-Bit / 32-Bit RPG (Gaya 2D-HD Golden Sun & Octopath Traveler)
+// Menyediakan tekstur blok kaya: Rumput halus bergradasi, pasir putih, air laut berombak, rumah desa, dan kincir angin Tongging
 
 export class TileEngine {
   constructor() {
-    this.tileSize = 32; // 32x32 px per blok (1 meter = 1 blok)
+    this.tileSize = 32; // 32x32 px per blok
     this.tiles = {};
-    this.initTiles();
+    this.props = {};
+    this.init();
   }
 
-  initTiles() {
-    this.tiles.grass1 = this.createGrassTile(1); // Rumput rimbun bertekstur
-    this.tiles.grass2 = this.createGrassTile(2); // Rumput dengan bunga liar merah muda & kuning
-    this.tiles.grass3 = this.createGrassTile(3); // Rumput dengan lumut & semanggi
-    this.tiles.path = this.createCobblestoneTile(); // Jalur batu bertekstur 3D
-    this.tiles.sand = this.createSandTile(); // Pasir pantai beriak
-    this.tiles.waterDeep = this.createWaterTile('#0c2340', '#184275'); // Air danau dalam
-    this.tiles.waterShallow = this.createWaterTile('#184275', '#2563eb'); // Air dangkal berkilau
-    this.tiles.wood = this.createWoodPlankTile(); // Jembatan & dermaga kayu
-    this.tiles.cliff = this.createCliffTile(); // Tebing batu cadas
-    this.tiles.tree = this.createTreeSprite(); // Pohon rimbun 48x64
+  init() {
+    this.createTerrainTiles();
+    this.createPropTiles();
   }
 
-  // 1. Tile Rumput 8-Bit / 16-Bit Bertekstur (Bukan Rumput Polos!)
-  createGrassTile(variant = 1) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 32;
-    const ctx = canvas.getContext('2d');
+  createTerrainTiles() {
+    // 1. Rumput 24-Bit / 32-Bit Rimbun & Halus (Lush RPG Grass)
+    this.tiles.grass1 = this.makeGrassTile(1);
+    this.tiles.grass2 = this.makeGrassTile(2); // dengan bunga padang rumput
+    this.tiles.grass3 = this.makeGrassTile(3); // dengan semanggi & lumut
+
+    // 2. Pasir Putih Bersih (White Sand Beach)
+    this.tiles.whiteSand = this.makeWhiteSandTile();
+
+    // 3. Air Danau & Laut Dalam / Dangkal
+    this.tiles.oceanDeep = this.makeWaterTile('#0b1d3a', '#10356c', '#1d559e');
+    this.tiles.oceanMid = this.makeWaterTile('#10356c', '#1d559e', '#38bdf8');
+    this.tiles.oceanShallow = this.makeWaterTile('#1d559e', '#2563eb', '#67e8f9');
+
+    // 4. Jalan Batu Cobblestone 32-Bit Bergradasi Halus
+    this.tiles.path = this.makeCobblestoneTile();
+
+    // 5. Kayu Dermaga & Jembatan
+    this.tiles.wood = this.makeWoodTile();
+
+    // 6. Batuan Cadas Tebing
+    this.tiles.cliff = this.makeCliffTile();
+  }
+
+  // 1. Rumput 32-Bit: Shading halus 6 tingkat warna hijau alami
+  makeGrassTile(variant = 1) {
+    const c = document.createElement('canvas');
+    c.width = 32; c.height = 32;
+    const ctx = c.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
-    // Warna dasar hijau daun tua
-    ctx.fillStyle = '#22471b';
+    // Gradasi dasar hijau zamrud
+    ctx.fillStyle = '#1e401b';
     ctx.fillRect(0, 0, 32, 32);
 
-    // Lapisan bayangan rumput (Dark Green Shading)
-    ctx.fillStyle = '#163311';
+    // Lapisan helai rumput gelap
+    ctx.fillStyle = '#153112';
     for (let x = 0; x < 32; x += 4) {
       for (let y = 0; y < 32; y += 4) {
-        if ((x * 7 + y * 13) % 5 === 0) {
-          ctx.fillRect(x, y, 3, 2);
+        if ((x * 11 + y * 19) % 3 === 0) {
+          ctx.fillRect(x, y, 3, 3);
         }
       }
     }
 
-    // Lapisan helai rumput hijau sedang (Mid Grass Blades)
-    ctx.fillStyle = '#2e5e24';
-    const bladeOffsets = [
-      [2, 3], [7, 8], [14, 5], [21, 10], [28, 4],
-      [4, 18], [11, 23], [19, 17], [26, 25], [15, 29]
+    // Helai rumput hidup bertingkat
+    const blades = [
+      [2, 2], [6, 7], [13, 3], [19, 8], [27, 4],
+      [4, 15], [10, 21], [17, 14], [25, 20], [8, 27], [22, 26]
     ];
-    bladeOffsets.forEach(([bx, by]) => {
-      ctx.fillRect(bx, by, 2, 4);
-      ctx.fillRect(bx + 1, by - 1, 2, 2);
+
+    // Mid tone
+    ctx.fillStyle = '#2d6325';
+    blades.forEach(([bx, by]) => {
+      ctx.fillRect(bx, by, 2, 5);
+      ctx.fillRect(bx + 1, by - 1, 2, 3);
     });
 
-    // Ujung helai rumput bercahaya (Sunlit Green Tips)
-    ctx.fillStyle = '#4c8a38';
-    bladeOffsets.forEach(([bx, by]) => {
-      ctx.fillRect(bx, by - 1, 2, 1);
+    // Highlight hijau muda
+    ctx.fillStyle = '#4c8c3a';
+    blades.forEach(([bx, by]) => {
+      ctx.fillRect(bx, by - 1, 2, 2);
     });
-    ctx.fillStyle = '#6cb54c';
-    ctx.fillRect(6, 6, 2, 1);
-    ctx.fillRect(20, 14, 2, 1);
-    ctx.fillRect(12, 24, 2, 1);
 
-    // Varian 2: Bunga liar padang rumput (Bunga pink & emas kecil)
+    // Pucuk rumput berkilau cahaya matahari (Sunlit Sparkle)
+    ctx.fillStyle = '#72be55';
+    blades.forEach(([bx, by]) => {
+      ctx.fillRect(bx + 1, by - 2, 1, 1);
+    });
+
+    // Varian Bunga Padang Rumput
     if (variant === 2) {
-      // Bunga pink manis
-      ctx.fillStyle = '#fda4af';
-      ctx.fillRect(8, 12, 3, 3);
+      // Bunga mawar mini pink
       ctx.fillStyle = '#f43f5e';
-      ctx.fillRect(9, 13, 1, 1);
+      ctx.fillRect(7, 10, 3, 3);
+      ctx.fillRect(8, 9, 1, 5);
+      ctx.fillStyle = '#fda4af';
+      ctx.fillRect(8, 10, 1, 1);
 
-      // Bunga kuning cerah
-      ctx.fillStyle = '#fef08a';
-      ctx.fillRect(22, 20, 3, 3);
-      ctx.fillStyle = '#eab308';
-      ctx.fillRect(23, 21, 1, 1);
+      // Bunga daisy kuning
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillRect(21, 18, 3, 3);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(22, 19, 1, 1);
+    } else if (variant === 3) {
+      // Semanggi & lumut tebal
+      ctx.fillStyle = '#61b347';
+      ctx.fillRect(14, 6, 4, 4);
+      ctx.fillStyle = '#8ee070';
+      ctx.fillRect(15, 7, 2, 2);
     }
 
-    // Varian 3: Semanggi & lumut tebal
-    if (variant === 3) {
-      ctx.fillStyle = '#559c3f';
-      ctx.fillRect(16, 8, 4, 3);
-      ctx.fillRect(17, 7, 2, 5);
-      ctx.fillStyle = '#82cf65';
-      ctx.fillRect(17, 8, 2, 2);
-    }
-
-    return canvas;
+    return c;
   }
 
-  // 2. Tile Jalan Batu Kuno (Cobblestone) dengan Detail 3D Chiseled
-  createCobblestoneTile() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 32;
-    const ctx = canvas.getContext('2d');
+  // 2. Pasir Putih Bersih (White Sand Beach)
+  makeWhiteSandTile() {
+    const c = document.createElement('canvas');
+    c.width = 32; c.height = 32;
+    const ctx = c.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
-    // Tanah dasar di sela bebatuan
-    ctx.fillStyle = '#3a2012';
+    // Pasir putih gading hangat
+    ctx.fillStyle = '#f3f4f6';
     ctx.fillRect(0, 0, 32, 32);
 
-    // 4 Batu blok per tile 32x32
+    // Butiran pasir keemasan lembut
+    ctx.fillStyle = '#e5e7eb';
+    for (let x = 0; x < 32; x += 4) {
+      for (let y = 0; y < 32; y += 4) {
+        if ((x * 13 + y * 7) % 4 === 0) {
+          ctx.fillRect(x, y, 2, 2);
+        }
+      }
+    }
+
+    // Riak angin halus di pasir
+    ctx.fillStyle = '#fef08a';
+    ctx.fillRect(3, 7, 12, 1);
+    ctx.fillRect(16, 17, 14, 1);
+    ctx.fillRect(5, 25, 10, 1);
+
+    // Kerang laut merah muda & mutiara
+    ctx.fillStyle = '#f472b6';
+    ctx.fillRect(20, 9, 2, 2);
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillRect(9, 19, 2, 1);
+
+    return c;
+  }
+
+  // 3. Tile Air Laut & Danau Berombak
+  makeWaterTile(cDeep, cMid, cLight) {
+    const c = document.createElement('canvas');
+    c.width = 32; c.height = 32;
+    const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+
+    ctx.fillStyle = cDeep;
+    ctx.fillRect(0, 0, 32, 32);
+
+    ctx.fillStyle = cMid;
+    ctx.fillRect(2, 6, 13, 3);
+    ctx.fillRect(18, 14, 11, 3);
+    ctx.fillRect(4, 22, 14, 3);
+
+    ctx.fillStyle = cLight;
+    ctx.fillRect(4, 7, 6, 1);
+    ctx.fillRect(20, 15, 5, 1);
+    ctx.fillRect(6, 23, 7, 1);
+
+    // Buih air putih berkilau
+    ctx.fillStyle = '#e0f2fe';
+    ctx.fillRect(5, 7, 2, 1);
+    ctx.fillRect(21, 15, 2, 1);
+
+    return c;
+  }
+
+  // 4. Cobblestone 32-Bit
+  makeCobblestoneTile() {
+    const c = document.createElement('canvas');
+    c.width = 32; c.height = 32;
+    const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+
+    ctx.fillStyle = '#2b1b12';
+    ctx.fillRect(0, 0, 32, 32);
+
     const stones = [
       { x: 1, y: 1, w: 14, h: 14 },
       { x: 17, y: 1, w: 14, h: 13 },
@@ -113,199 +191,268 @@ export class TileEngine {
     ];
 
     stones.forEach(s => {
-      // Warna badan batu
-      ctx.fillStyle = '#6b4f3b';
+      ctx.fillStyle = '#6e513e';
       ctx.fillRect(s.x, s.y, s.w, s.h);
-
-      // Highlight atas & kiri batu (Cahaya)
-      ctx.fillStyle = '#9c775d';
+      ctx.fillStyle = '#9e7b64';
       ctx.fillRect(s.x, s.y, s.w - 1, 2);
       ctx.fillRect(s.x, s.y, 2, s.h - 1);
-
-      // Bayangan bawah & kanan batu
-      ctx.fillStyle = '#4a3324';
+      ctx.fillStyle = '#483022';
       ctx.fillRect(s.x + 1, s.y + s.h - 2, s.w - 1, 2);
       ctx.fillRect(s.x + s.w - 2, s.y + 1, 2, s.h - 1);
-
-      // Tekstur bintik batu alami
-      ctx.fillStyle = '#85634c';
-      ctx.fillRect(s.x + 4, s.y + 4, 2, 2);
-      ctx.fillRect(s.x + s.w - 6, s.y + s.h - 6, 2, 2);
     });
 
-    return canvas;
+    return c;
   }
 
-  // 3. Tile Air Danau Berombak 8-Bit / 16-Bit
-  createWaterTile(baseColor, lightColor) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 32;
-    const ctx = canvas.getContext('2d');
+  makeWoodTile() {
+    const c = document.createElement('canvas');
+    c.width = 32; c.height = 32;
+    const ctx = c.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
-    ctx.fillStyle = baseColor;
+    ctx.fillStyle = '#3a1a0c';
     ctx.fillRect(0, 0, 32, 32);
 
-    // Garis riak gelombang air
-    ctx.fillStyle = lightColor;
-    ctx.fillRect(2, 6, 12, 2);
-    ctx.fillRect(18, 14, 10, 2);
-    ctx.fillRect(4, 22, 14, 2);
-    ctx.fillRect(20, 28, 8, 2);
-
-    // Kilau pantulan cahaya matahari pada air
-    ctx.fillStyle = '#93c5fd';
-    ctx.fillRect(5, 7, 4, 1);
-    ctx.fillRect(21, 15, 3, 1);
-    ctx.fillRect(7, 23, 4, 1);
-
-    return canvas;
-  }
-
-  // 4. Tile Pasir Pantai Hangat
-  createSandTile() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 32;
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
-
-    // Warna pasir dasar
-    ctx.fillStyle = '#d99b3b';
-    ctx.fillRect(0, 0, 32, 32);
-
-    // Garis riak angin di pasir
-    ctx.fillStyle = '#eab308';
-    ctx.fillRect(4, 8, 14, 2);
-    ctx.fillRect(14, 18, 15, 2);
-    ctx.fillRect(2, 26, 12, 2);
-
-    // Bintik butiran pasir halus & kerang kecil
-    ctx.fillStyle = '#b47721';
-    ctx.fillRect(8, 14, 2, 1);
-    ctx.fillRect(24, 6, 2, 1);
-    ctx.fillRect(20, 24, 2, 1);
-
-    // Kerang putih mungil
-    ctx.fillStyle = '#fef08a';
-    ctx.fillRect(18, 10, 2, 2);
-
-    return canvas;
-  }
-
-  // 5. Tile Kayu Dermaga / Jembatan (Wood Planks)
-  createWoodPlankTile() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 32;
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
-
-    ctx.fillStyle = '#3e1c0c'; // Sela kayu gelap
-    ctx.fillRect(0, 0, 32, 32);
-
-    // 3 Papan kayu horizontal
     for (let py = 1; py < 32; py += 10) {
       ctx.fillStyle = '#78350f';
       ctx.fillRect(0, py, 32, 8);
-
-      // Serat kayu & highlight atas
       ctx.fillStyle = '#9a4714';
       ctx.fillRect(0, py, 32, 2);
-      ctx.fillRect(6, py + 3, 12, 1);
-      ctx.fillRect(20, py + 5, 8, 1);
-
-      // Bayangan bawah papan
       ctx.fillStyle = '#451a03';
       ctx.fillRect(0, py + 6, 32, 2);
-
-      // Paku besi di ujung papan
       ctx.fillStyle = '#cbd5e1';
       ctx.fillRect(3, py + 3, 2, 2);
       ctx.fillRect(27, py + 3, 2, 2);
     }
-
-    return canvas;
+    return c;
   }
 
-  // 6. Tile Tebing Cadas / Batuan Gunung (Cliff Rock)
-  createCliffTile() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 32;
-    canvas.height = 32;
-    const ctx = canvas.getContext('2d');
+  makeCliffTile() {
+    const c = document.createElement('canvas');
+    c.width = 32; c.height = 32;
+    const ctx = c.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
-    ctx.fillStyle = '#1e293b'; // Bayangan batu
+    ctx.fillStyle = '#1e293b';
     ctx.fillRect(0, 0, 32, 32);
-
-    // Lapisan batuan cadas berlapis (Strata)
     ctx.fillStyle = '#334155';
     ctx.fillRect(2, 2, 28, 13);
     ctx.fillRect(2, 17, 28, 13);
-
-    // Highlight tajam sudut batu
     ctx.fillStyle = '#64748b';
     ctx.fillRect(2, 2, 28, 2);
     ctx.fillRect(2, 17, 28, 2);
-    ctx.fillRect(2, 2, 2, 13);
-    ctx.fillRect(2, 17, 2, 13);
-
-    // Retakan batu cadas
-    ctx.fillStyle = '#0f172a';
-    ctx.fillRect(12, 4, 2, 8);
-    ctx.fillRect(20, 19, 2, 9);
-
-    return canvas;
+    return c;
   }
 
-  // 7. Sprite Pohon Rindang Final Fantasy (48x64 px)
-  createTreeSprite() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 48;
-    canvas.height = 64;
-    const ctx = canvas.getContext('2d');
+  // ==========================================
+  // PROPERTI DUNIA: RUMAH DESA, KINCIR ANGIN, POHON
+  // ==========================================
+  createPropTiles() {
+    // 1. Rumah Pedesaan Meat (Rumah Kayu Asri 64x64 px)
+    this.props.cottage = this.createCottageSprite();
+
+    // 2. Kincir Angin Tongging (Windmill Tower 50x70 px)
+    this.props.windmillTower = this.createWindmillTower();
+
+    // 3. Pohon Rindang 32-Bit
+    this.props.tree = this.createTreeSprite();
+
+    // 4. Perahu Samosir dengan Layar Romantis
+    this.props.boat = this.createBoatSprite();
+  }
+
+  createCottageSprite() {
+    const c = document.createElement('canvas');
+    c.width = 64; c.height = 64;
+    const ctx = c.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
-    // Batang pohon & akar
+    // Bayangan dasar rumah
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.beginPath();
+    ctx.ellipse(32, 58, 28, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Dinding kayu pedesaan
+    ctx.fillStyle = '#78350f';
+    ctx.fillRect(10, 26, 44, 32);
+    ctx.fillStyle = '#9a4714';
+    ctx.fillRect(12, 26, 40, 2);
+
+    // Garis balok kayu dinding
+    ctx.fillStyle = '#451a03';
+    ctx.fillRect(10, 36, 44, 2);
+    ctx.fillRect(10, 46, 44, 2);
+
+    // Pintu kayu pedesaan
+    ctx.fillStyle = '#3d1a04';
+    ctx.fillRect(26, 38, 12, 20);
+    ctx.fillStyle = '#fbbf24'; // Gagang pintu kuningan
+    ctx.fillRect(35, 48, 2, 2);
+
+    // Jendela hangat berpendar cahaya
+    ctx.fillStyle = '#fef08a';
+    ctx.fillRect(14, 34, 8, 8);
+    ctx.fillRect(42, 34, 8, 8);
+    ctx.fillStyle = '#78350f';
+    ctx.fillRect(17, 34, 2, 8);
+    ctx.fillRect(14, 37, 8, 2);
+    ctx.fillRect(45, 34, 2, 8);
+    ctx.fillRect(42, 37, 8, 2);
+
+    // Atap Rumah Jerami/Rumbia Pedesaan (Segitiga Bertingkat)
+    ctx.fillStyle = '#854d0e';
+    ctx.beginPath();
+    ctx.moveTo(32, 4);
+    ctx.lineTo(60, 28);
+    ctx.lineTo(4, 28);
+    ctx.closePath();
+    ctx.fill();
+
+    // Shading jerami atap
+    ctx.fillStyle = '#a16207';
+    ctx.beginPath();
+    ctx.moveTo(32, 6);
+    ctx.lineTo(56, 26);
+    ctx.lineTo(8, 26);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#ca8a04';
+    ctx.beginPath();
+    ctx.moveTo(32, 9);
+    ctx.lineTo(50, 24);
+    ctx.lineTo(14, 24);
+    ctx.closePath();
+    ctx.fill();
+
+    // Cerobong asap kecil
+    ctx.fillStyle = '#64748b';
+    ctx.fillRect(44, 8, 6, 12);
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillRect(43, 6, 8, 3);
+
+    return c;
+  }
+
+  createWindmillTower() {
+    const c = document.createElement('canvas');
+    c.width = 50; c.height = 70;
+    const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+
+    // Menara kincir angin batu/kayu silinder meruncing
+    ctx.fillStyle = '#475569';
+    ctx.beginPath();
+    ctx.moveTo(18, 16);
+    ctx.lineTo(32, 16);
+    ctx.lineTo(38, 68);
+    ctx.lineTo(12, 68);
+    ctx.closePath();
+    ctx.fill();
+
+    // Highlight dinding menara
+    ctx.fillStyle = '#64748b';
+    ctx.beginPath();
+    ctx.moveTo(20, 16);
+    ctx.lineTo(28, 16);
+    ctx.lineTo(32, 68);
+    ctx.lineTo(16, 68);
+    ctx.closePath();
+    ctx.fill();
+
+    // Pintu menara
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(22, 54, 8, 14);
+
+    // Atap kubah menara kincir angin
+    ctx.fillStyle = '#991b1b';
+    ctx.beginPath();
+    ctx.ellipse(25, 16, 10, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Poros tengah kincir
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath();
+    ctx.arc(25, 18, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    return c;
+  }
+
+  createBoatSprite() {
+    const c = document.createElement('canvas');
+    c.width = 44; c.height = 36;
+    const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+
+    // Badan perahu kayu
+    ctx.fillStyle = '#78350f';
+    ctx.beginPath();
+    ctx.ellipse(22, 26, 18, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#9a4714';
+    ctx.beginPath();
+    ctx.ellipse(22, 25, 15, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Tiang layar
+    ctx.fillStyle = '#451a03';
+    ctx.fillRect(21, 6, 3, 20);
+
+    // Layar romantis putih-pink
+    ctx.fillStyle = '#f8fafc';
+    ctx.beginPath();
+    ctx.moveTo(23, 7);
+    ctx.lineTo(38, 16);
+    ctx.lineTo(23, 22);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#fda4af';
+    ctx.fillRect(24, 13, 10, 3);
+
+    return c;
+  }
+
+  createTreeSprite() {
+    const c = document.createElement('canvas');
+    c.width = 48; c.height = 64;
+    const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+
+    // Batang
     ctx.fillStyle = '#451a03';
     ctx.fillRect(20, 42, 8, 18);
     ctx.fillStyle = '#78350f';
-    ctx.fillRect(21, 42, 4, 18); // Highlight batang
-    ctx.fillStyle = '#2b1002';
-    ctx.fillRect(17, 56, 5, 4); // Akar kiri
-    ctx.fillRect(26, 56, 5, 4); // Akar kanan
+    ctx.fillRect(21, 42, 4, 18);
 
-    // Rimbunan daun tingkat bawah (Lebar)
-    ctx.fillStyle = '#163812';
+    // Daun bertingkat
+    ctx.fillStyle = '#143811';
     ctx.beginPath();
     ctx.arc(24, 38, 20, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#22551c';
+    ctx.fillStyle = '#1d5518';
     ctx.beginPath();
     ctx.arc(23, 35, 17, 0, Math.PI * 2);
     ctx.fill();
 
-    // Rimbunan daun tingkat tengah
-    ctx.fillStyle = '#2d6a25';
+    ctx.fillStyle = '#296b22';
     ctx.beginPath();
     ctx.arc(24, 24, 16, 0, Math.PI * 2);
     ctx.fill();
 
-    // Rimbunan daun tingkat atas & highlight matahari
-    ctx.fillStyle = '#3d8833';
+    ctx.fillStyle = '#3a8731';
     ctx.beginPath();
     ctx.arc(22, 18, 13, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#5db04e';
+    ctx.fillStyle = '#59ae4d';
     ctx.beginPath();
-    ctx.arc(19, 14, 8, 0, Math.PI * 2);
+    ctx.arc(20, 14, 8, 0, Math.PI * 2);
     ctx.fill();
 
-    return canvas;
+    return c;
   }
 }
 

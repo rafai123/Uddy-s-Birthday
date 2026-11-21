@@ -7,16 +7,16 @@ import { LOCATIONS_DATA, SECRET_AREA } from '../data/locations';
 export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLeaveLocation, moveVector }) {
   const canvasRef = useRef(null);
   const stateRef = useRef({
-    tileSize: 32, // 32x32 px (1 Meter = 1 Blok)
-    cols: 40,     // 40 blok = 1280px lebar
-    rows: 52,     // 52 blok = 1664px tinggi
-    worldWidth: 1280,
-    worldHeight: 1664,
+    tileSize: 32, // 32x32 px per blok (1 Meter = 1 Blok)
+    cols: 42,     // 1344 px
+    rows: 54,     // 1728 px
+    worldWidth: 1344,
+    worldHeight: 1728,
     camera: { x: 0, y: 0 },
     player: {
-      x: 640,
-      y: 740,
-      speed: 1.85, // Kecepatan santai & anggun
+      x: 672,
+      y: 780,
+      speed: 1.85, // Kecepatan berjalan santai & anggun
       vx: 0,
       vy: 0,
       facing: 'down',
@@ -28,10 +28,11 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
     targetPos: null,
     currentNear: null,
     ambientParticles: [],
+    windmillAngle: 0, // Sudut putaran kincir angin Tongging
     treeLocations: [
-      { x: 180, y: 380 }, { x: 260, y: 320 }, { x: 580, y: 280 }, { x: 680, y: 320 },
-      { x: 140, y: 920 }, { x: 220, y: 980 }, { x: 740, y: 950 }, { x: 820, y: 1020 },
-      { x: 380, y: 1120 }, { x: 720, y: 1140 }, { x: 480, y: 680 }, { x: 780, y: 680 }
+      { x: 140, y: 380 }, { x: 220, y: 330 }, { x: 580, y: 280 }, { x: 680, y: 320 },
+      { x: 120, y: 940 }, { x: 220, y: 990 }, { x: 740, y: 960 }, { x: 840, y: 1020 },
+      { x: 380, y: 1140 }, { x: 740, y: 1150 }, { x: 480, y: 700 }, { x: 820, y: 700 }
     ],
     tick: 0
   });
@@ -39,10 +40,10 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
   // Partikel ambient romantis
   useEffect(() => {
     const particles = [];
-    for (let i = 0; i < 45; i++) {
+    for (let i = 0; i < 48; i++) {
       particles.push({
-        x: Math.random() * 1280,
-        y: Math.random() * 1664,
+        x: Math.random() * 1344,
+        y: Math.random() * 1728,
         vx: (Math.random() - 0.5) * 0.4 + 0.2,
         vy: Math.random() * 0.4 + 0.2,
         size: Math.random() * 2.5 + 1.5,
@@ -54,7 +55,7 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
     stateRef.current.ambientParticles = particles;
   }, []);
 
-  // Update joystick / keyboard movement
+  // Update input vektor pergerakan
   useEffect(() => {
     const s = stateRef.current;
     if (moveVector.x !== 0 || moveVector.y !== 0) {
@@ -75,7 +76,7 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
     }
   }, [moveVector]);
 
-  // Main canvas loop & render
+  // Main Canvas Loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -89,7 +90,7 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
     handleResize();
     window.addEventListener('resize', handleResize);
 
-    // Tap to walk
+    // Tap-to-walk
     const handleTap = (e) => {
       if (e.target !== canvas) return;
       const rect = canvas.getBoundingClientRect();
@@ -110,8 +111,9 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
     const loop = () => {
       const s = stateRef.current;
       s.tick++;
+      s.windmillAngle += 0.025; // Putaran kincir angin Tongging
 
-      // 1. Logika Tap to walk
+      // 1. Tap to walk
       if (s.targetPos) {
         const dx = s.targetPos.x - s.player.x;
         const dy = s.targetPos.y - s.player.y;
@@ -156,11 +158,10 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
         s.player.animTimer = 0;
       }
 
-      // 4. Smooth Camera follow (Responsif Desktop & Mobile)
+      // 4. Smooth Camera follow (Desktop Auto-Centering & Mobile Track)
       let targetCamX = s.player.x - canvas.width / 2;
       let targetCamY = s.player.y - canvas.height / 2;
 
-      // Jika layar desktop lebih lebar dari peta (misal 1920x1080), pusatkan peta secara otomatis
       if (canvas.width > s.worldWidth) {
         targetCamX = -(canvas.width - s.worldWidth) / 2;
       } else {
@@ -180,14 +181,14 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
       let near = null;
       for (const loc of LOCATIONS_DATA) {
         const d = Math.hypot(loc.coords.x - s.player.x, loc.coords.y - s.player.y);
-        if (d < 75) {
+        if (d < 80) {
           near = loc;
           break;
         }
       }
       if (!near) {
         const dSecret = Math.hypot(SECRET_AREA.coords.x - s.player.x, SECRET_AREA.coords.y - s.player.y);
-        if (dSecret < 90) {
+        if (dSecret < 95) {
           near = SECRET_AREA;
         }
       }
@@ -209,12 +210,10 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
       }
 
       // ==========================================
-      // RENDER TILES 8-BIT / 16-BIT (1 Meter = 1 Blok 32x32)
+      // RENDER DUNIA 32-BIT
       // ==========================================
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Latar belakang kosmik retro jika di layar monitor lebar
-      ctx.fillStyle = '#060b18';
+      ctx.fillStyle = '#050a16'; // Latar luar kosmik
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.save();
@@ -222,153 +221,269 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
 
       const T = s.tileSize; // 32px
 
-      // A. Gambar Seluruh Grid Rumput Bertekstur (Bukan Rumput Polos!)
+      // 1. Grid Dasar: Padang Rumput 32-Bit Bertekstur
       for (let c = 0; c < s.cols; c++) {
         for (let r = 0; r < s.rows; r++) {
           const x = c * T;
           const y = r * T;
-
-          // Pola variasi rumput alami (rumput tebal, bunga liar, semanggi)
-          const seed = (c * 17 + r * 31) % 10;
+          const seed = (c * 13 + r * 29) % 10;
           let grassTile = tileEngine.tiles.grass1;
-          if (seed === 0) grassTile = tileEngine.tiles.grass2; // Bunga liar
-          else if (seed === 1) grassTile = tileEngine.tiles.grass3; // Semanggi
-
+          if (seed === 0) grassTile = tileEngine.tiles.grass2;
+          else if (seed === 1) grassTile = tileEngine.tiles.grass3;
           ctx.drawImage(grassTile, x, y);
         }
       }
 
-      // B. Kawasan Danau Toba (Air Biru Berombak & Berkilau)
-      // Koordinat danau sekitar c: 8..28, r: 8..24
-      for (let c = 8; c <= 26; c++) {
-        for (let r = 7; r <= 20; r++) {
-          const dx = (c - 17);
-          const dy = (r - 13.5);
-          if ((dx * dx) / 80 + (dy * dy) / 38 < 1.0) {
-            const isDeep = (dx * dx) / 50 + (dy * dy) / 22 < 1.0;
-            const wTile = isDeep ? tileEngine.tiles.waterDeep : tileEngine.tiles.waterShallow;
-            ctx.drawImage(wTile, c * T, r * T);
+      // 2. KAWASAN PANTAI PASIR PUTIH & LAUT KE SUDUT KANAN ATAS
+      // Dari c: 26..41 dan r: 0..20 adalah laut dan pantai pasir putih
+      for (let c = 24; c < s.cols; c++) {
+        for (let r = 0; r <= 22; r++) {
+          const x = c * T;
+          const y = r * T;
+
+          // Jarak dari garis pantai (garis diagonal pantai dari c:24, r:20 ke c:34, r:0)
+          const coastLine = (c - 24) * 1.5 - r;
+
+          if (coastLine > 8) {
+            // Laut Dalam & Luas sampai Sudut Kanan Atas
+            ctx.drawImage(tileEngine.tiles.oceanDeep, x, y);
+          } else if (coastLine > 3) {
+            // Laut Tengah
+            ctx.drawImage(tileEngine.tiles.oceanMid, x, y);
+          } else if (coastLine > 0) {
+            // Laut Dangkal dengan Buih Ombak
+            ctx.drawImage(tileEngine.tiles.oceanShallow, x, y);
+            // Buih ombak putih animasi
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(x + Math.sin(s.tick * 0.08 + r) * 4, y + 14, 20, 2);
+          } else if (coastLine > -4) {
+            // Hamparan Pasir Putih Bersih
+            ctx.drawImage(tileEngine.tiles.whiteSand, x, y);
           }
         }
       }
 
-      // C. Pulau Samosir di Tengah Danau
-      for (let c = 11; c <= 17; c++) {
-        for (let r = 9; r <= 13; r++) {
-          const dx = (c - 14);
-          const dy = (r - 11);
-          if ((dx * dx) / 8 + (dy * dy) / 3.5 < 1.0) {
+      // 3. DANAU TOBA & PULAU SAMOSIR DI TENGAH DANAU
+      // Danau Toba melingkupi c: 6..24, r: 6..20 (Air danau mengitari pulau di tengah)
+      for (let c = 6; c <= 25; c++) {
+        for (let r = 6; r <= 20; r++) {
+          const dx = (c - 15.5);
+          const dy = (r - 13);
+          // Bentuk lingkaran danau luas
+          if ((dx * dx) / 85 + (dy * dy) / 45 < 1.0) {
+            const isDeep = (dx * dx) / 50 + (dy * dy) / 25 < 1.0;
+            ctx.drawImage(isDeep ? tileEngine.tiles.oceanDeep : tileEngine.tiles.oceanMid, c * T, r * T);
+          }
+        }
+      }
+
+      // PULAU SAMOSIR (Pulau Utuh di Tengah Danau Toba)
+      for (let c = 11; c <= 19; c++) {
+        for (let r = 10; r <= 16; r++) {
+          const dx = (c - 15);
+          const dy = (r - 13);
+          // Pulau elips di dalam air
+          if ((dx * dx) / 12 + (dy * dy) / 6.5 < 1.0) {
             ctx.drawImage(tileEngine.tiles.grass1, c * T, r * T);
           }
         }
       }
 
-      // Jembatan & Dermaga Kayu Samosir
-      for (let c = 12; c <= 15; c++) {
+      // Jembatan Kayu / Dermaga Penghubung ke Samosir
+      for (let c = 8; c <= 12; c++) {
         ctx.drawImage(tileEngine.tiles.wood, c * T, 13 * T);
       }
 
-      // D. Perbukitan & Tebing Sinabung (Batu Cadas Berlapis)
-      for (let c = 4; c <= 13; c++) {
-        for (let r = 18; r <= 23; r++) {
-          if (c + r > 24 && c - r < -7) {
-            ctx.drawImage(tileEngine.tiles.cliff, c * T, r * T);
-          }
+      // Perahu Kayu dengan Layar di Dermaga Samosir
+      ctx.drawImage(tileEngine.props.boat, 10 * T - 10, 14 * T);
+
+      // 4. GUNUNG SINABUNG (Stratovolcano Megah 32-Bit dengan Kepulan Asap Kawah)
+      // Lereng dan Puncak Sinabung di sisi kiri (c: 2..15, r: 18..27)
+      const mtBaseX = 280;
+      const mtBaseY = 740;
+      const mtPeakX = 260;
+      const mtPeakY = 480;
+
+      // Bayangan lereng gunung
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.moveTo(60, mtBaseY);
+      ctx.lineTo(mtPeakX, mtPeakY);
+      ctx.lineTo(460, mtBaseY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Badan gunung stratovolcano berlapis cadas & abu vulkanik
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.moveTo(80, mtBaseY);
+      ctx.lineTo(mtPeakX, mtPeakY + 4);
+      ctx.lineTo(440, mtBaseY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Punggung lereng (Mountain Ridges) Sinabung
+      ctx.fillStyle = '#334155';
+      ctx.beginPath();
+      ctx.moveTo(mtPeakX, mtPeakY + 4);
+      ctx.lineTo(mtPeakX - 60, mtBaseY);
+      ctx.lineTo(mtPeakX + 80, mtBaseY);
+      ctx.closePath();
+      ctx.fill();
+
+      // Salju/batuan cadas putih di bibir kawah puncak
+      ctx.fillStyle = '#e2e8f0';
+      ctx.beginPath();
+      ctx.moveTo(mtPeakX - 25, mtPeakY + 28);
+      ctx.lineTo(mtPeakX, mtPeakY);
+      ctx.lineTo(mtPeakX + 30, mtPeakY + 32);
+      ctx.closePath();
+      ctx.fill();
+
+      // Kepulan kabut/asap putih lembut dari kawah Sinabung
+      const smokeDrift = Math.sin(s.tick * 0.04) * 8;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.beginPath();
+      ctx.arc(mtPeakX + smokeDrift, mtPeakY - 14, 16, 0, Math.PI * 2);
+      ctx.arc(mtPeakX + smokeDrift + 14, mtPeakY - 26, 22, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Hutan cemara di kaki Gunung Sinabung
+      for (let mx = 100; mx <= 420; mx += 36) {
+        ctx.drawImage(tileEngine.props.tree, mx, mtBaseY - 48);
+      }
+
+      // 5. BUKIT-BUKIT TONGGING & KINCIR ANGIN (WINDMILL)
+      // Bukit-bukit bergelombang menghadap danau di c: 26..37, r: 21..28
+      for (let c = 26; c <= 38; c++) {
+        for (let r = 21; r <= 28; r++) {
+          ctx.drawImage(tileEngine.tiles.cliff, c * T, r * T);
         }
       }
 
-      // E. Pantai Pasir Keemasan (Kanan Atas)
-      for (let c = 27; c <= 37; c++) {
-        for (let r = 8; r <= 17; r++) {
-          const dx = (c - 32);
-          const dy = (r - 12);
-          if ((dx * dx) / 26 + (dy * dy) / 20 < 1.0) {
-            ctx.drawImage(tileEngine.tiles.sand, c * T, r * T);
-          }
-        }
+      // Menara Kincir Angin Tongging
+      const wmX = 33 * T;
+      const wmY = 22 * T;
+      ctx.drawImage(tileEngine.props.windmillTower, wmX - 25, wmY - 40);
+
+      // Baling-baling Kincir Angin Berputar (4 Layar Kincir 32-Bit)
+      const rotorX = wmX;
+      const rotorY = wmY - 22;
+      ctx.save();
+      ctx.translate(rotorX, rotorY);
+      ctx.rotate(s.windmillAngle);
+
+      for (let b = 0; b < 4; b++) {
+        ctx.rotate(Math.PI / 2);
+        // Tangkai kincir
+        ctx.fillStyle = '#78350f';
+        ctx.fillRect(-2, -34, 4, 34);
+        // Kain layar kincir putih
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(2, -32, 10, 26);
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(2, -32, 10, 26);
+      }
+      ctx.restore();
+
+      // Pagar pembatas dek pemandangan Tongging
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(28 * T, 25 * T, 8 * T, 4);
+      for (let fx = 28 * T; fx <= 36 * T; fx += 20) {
+        ctx.fillRect(fx, 25 * T - 8, 4, 12);
       }
 
-      // F. Lembah Sawah Desa Meat (Terasering Hijau Asri)
-      for (let c = 14; c <= 26; c++) {
-        for (let r = 30; r <= 36; r++) {
+      // 6. DESA MEAT (Rumah-Rumah Pedesaan Asri & Sawah Terasering)
+      // Rumah kayu pedesaan 1
+      ctx.drawImage(tileEngine.props.cottage, 16 * T, 31 * T);
+      // Rumah kayu pedesaan 2
+      ctx.drawImage(tileEngine.props.cottage, 22 * T, 32 * T);
+
+      // Petak-petak sawah hijau berundak
+      for (let c = 15; c <= 25; c++) {
+        for (let r = 35; r <= 39; r++) {
           ctx.drawImage(tileEngine.tiles.grass2, c * T, r * T);
-          // Batas petak sawah
           ctx.strokeStyle = '#14532d';
           ctx.lineWidth = 2;
           ctx.strokeRect(c * T, r * T, T, T);
         }
       }
 
-      // G. Tebing Tinggi Tongging (Batu Cadas Kanan Tengah)
-      for (let c = 27; c <= 36; c++) {
-        for (let r = 22; r <= 27; r++) {
-          ctx.drawImage(tileEngine.tiles.cliff, c * T, r * T);
-        }
+      // Pagar kayu pedesaan Meat
+      ctx.fillStyle = '#854d0e';
+      ctx.fillRect(14 * T, 30 * T, 13 * T, 3);
+      for (let px = 14 * T; px <= 27 * T; px += 28) {
+        ctx.fillRect(px, 30 * T - 8, 4, 11);
       }
 
-      // H. Jalur Batu Setapak Cobblestone (3D Chiseled Blocks)
-      // Jalur vertikal tengah
-      for (let r = 20; r <= 30; r++) {
-        ctx.drawImage(tileEngine.tiles.path, 19 * T, r * T);
+      // 7. JALUR BATU COBBLESTONE (Menghubungkan Semua Lokasi)
+      // Persimpangan jalan tengah
+      for (let r = 21; r <= 31; r++) {
         ctx.drawImage(tileEngine.tiles.path, 20 * T, r * T);
+        ctx.drawImage(tileEngine.tiles.path, 21 * T, r * T);
       }
       // Cabang ke Samosir
-      for (let c = 13; c <= 20; c++) {
-        ctx.drawImage(tileEngine.tiles.path, c * T, 14 * T);
+      for (let c = 12; c <= 20; c++) {
+        ctx.drawImage(tileEngine.tiles.path, c * T, 15 * T);
       }
       // Cabang ke Sinabung
-      for (let c = 8; c <= 19; c++) {
-        ctx.drawImage(tileEngine.tiles.path, c * T, 20 * T);
+      for (let c = 9; c <= 20; c++) {
+        ctx.drawImage(tileEngine.tiles.path, c * T, 22 * T);
       }
       // Cabang ke Pantai
-      for (let c = 20; c <= 30; c++) {
-        ctx.drawImage(tileEngine.tiles.path, c * T, 13 * T);
+      for (let c = 21; c <= 31; c++) {
+        ctx.drawImage(tileEngine.tiles.path, c * T, 14 * T);
       }
       // Cabang ke Tongging
-      for (let c = 20; c <= 30; c++) {
-        ctx.drawImage(tileEngine.tiles.path, c * T, 24 * T);
+      for (let c = 21; c <= 31; c++) {
+        ctx.drawImage(tileEngine.tiles.path, c * T, 25 * T);
       }
-      // Jalur jembatan kosmik ke Area Rahasia
-      for (let r = 36; r <= 44; r++) {
-        ctx.drawImage(tileEngine.tiles.wood, 19 * T, r * T);
+      // Cabang ke Meat
+      for (let r = 31; r <= 35; r++) {
+        ctx.drawImage(tileEngine.tiles.path, 20 * T, r * T);
+      }
+      // Jalur kayu kosmik menuju Area Rahasia
+      for (let r = 40; r <= 46; r++) {
+        ctx.drawImage(tileEngine.tiles.wood, 20 * T, r * T);
       }
 
-      // I. Pohon-Pohon Rindang Final Fantasy (48x64 px)
+      // 8. POHON-POHON RINDANG 32-BIT
       s.treeLocations.forEach(tl => {
-        ctx.drawImage(tileEngine.tiles.tree, tl.x, tl.y);
+        ctx.drawImage(tileEngine.props.tree, tl.x, tl.y);
       });
 
-      // J. 5 Monumen Kristal Kenangan (Sacred Crystal Altars)
+      // 9. 5 MONUMEN KRISTAL KENANGAN (Sacred Crystals)
       LOCATIONS_DATA.forEach((loc, idx) => {
         const isVisited = visitedList.includes(loc.id);
         const x = loc.coords.x;
         const y = loc.coords.y;
 
-        // Aura Kristal
-        const pWave = Math.sin(s.tick * 0.08 + idx) * 4;
-        const grad = ctx.createRadialGradient(x, y, 4, x, y, 36 + pWave);
+        // Pendar Aura Kristal
+        const pWave = Math.sin(s.tick * 0.08 + idx) * 5;
+        const grad = ctx.createRadialGradient(x, y, 4, x, y, 38 + pWave);
         grad.addColorStop(0, loc.crystalColor + (isVisited ? 'aa' : '66'));
         grad.addColorStop(1, 'transparent');
         ctx.fillStyle = grad;
         ctx.beginPath();
-        ctx.arc(x, y, 36 + pWave, 0, Math.PI * 2);
+        ctx.arc(x, y, 38 + pWave, 0, Math.PI * 2);
         ctx.fill();
 
         // Altar Batu
         ctx.drawImage(ffSprites.propSprites.shrine, x - 20, y - 23);
 
-        // Kristal Melayang
+        // Kristal Melayang Berkilau
         const floatY = y - 36 + Math.sin(s.tick * 0.08 + idx * 1.5) * 4;
         ctx.fillStyle = loc.crystalColor;
         ctx.beginPath();
-        ctx.moveTo(x, floatY - 10);
-        ctx.lineTo(x + 8, floatY);
-        ctx.lineTo(x, floatY + 10);
-        ctx.lineTo(x - 8, floatY);
+        ctx.moveTo(x, floatY - 12);
+        ctx.lineTo(x + 9, floatY);
+        ctx.lineTo(x, floatY + 12);
+        ctx.lineTo(x - 9, floatY);
         ctx.closePath();
         ctx.fill();
         ctx.fillStyle = '#ffffff';
-        ctx.fillRect(x - 2, floatY - 4, 4, 4);
+        ctx.fillRect(x - 2, floatY - 5, 4, 4);
 
         // Label Ikon & Nama
         ctx.fillStyle = '#ffffff';
@@ -383,7 +498,7 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
         ctx.shadowBlur = 0;
       });
 
-      // K. Area Rahasia: Our Little Universe (Pulau Terapung Kosmik)
+      // 10. AREA RAHASIA: OUR LITTLE UNIVERSE (PULAU KOSMIK TERAPUNG)
       const secX = SECRET_AREA.coords.x;
       const secY = SECRET_AREA.coords.y;
       const secPulse = Math.sin(s.tick * 0.06) * 10;
@@ -395,7 +510,7 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
       ctx.arc(secX, secY, 130 + secPulse, 0, Math.PI * 2);
       ctx.fill();
 
-      // Pulau Terapung
+      // Pulau Terapung Bintang
       ctx.fillStyle = '#1e1b4b';
       ctx.beginPath();
       ctx.ellipse(secX, secY, 110, 55, 0, 0, Math.PI * 2);
@@ -419,7 +534,7 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
         ctx.fillText('TERKUNCI', secX, secY + 22);
       }
 
-      // L. Tap-to-walk Marker
+      // 11. Tap Marker
       if (s.targetPos) {
         const pulse = (Math.sin(s.tick * 0.15) + 1) * 3;
         ctx.strokeStyle = '#38bdf8';
@@ -432,11 +547,11 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
         ctx.fillText('💖', s.targetPos.x, s.targetPos.y + 5);
       }
 
-      // M. Karakter Pemain (Sang Kekasih)
+      // 12. KARAKTER PEMAIN (SANG KEKASIH) 32-BIT
       const p = s.player;
       const sprite = ffSprites.characterSheets[p.facing]?.[p.frame];
       if (sprite) {
-        ctx.drawImage(sprite, Math.floor(p.x - 16), Math.floor(p.y - 30));
+        ctx.drawImage(sprite, Math.floor(p.x - 18), Math.floor(p.y - 34));
       }
 
       // Nama karakter di atas kepala
@@ -445,10 +560,10 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
       ctx.textAlign = 'center';
       ctx.shadowColor = '#000';
       ctx.shadowBlur = 4;
-      ctx.fillText('Udy ❤️', p.x, p.y - 34);
+      ctx.fillText('Udy ❤️', p.x, p.y - 38);
       ctx.shadowBlur = 0;
 
-      // N. Partikel Melayang (Kelopak Sakura, Hati, Kunang-kunang)
+      // 13. PARTIKEL AMBIENT (Kelopak Sakura, Hati, Kunang-kunang)
       for (const pt of s.ambientParticles) {
         ctx.save();
         ctx.globalAlpha = Math.max(0.1, Math.min(1, pt.alpha));
