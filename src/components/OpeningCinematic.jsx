@@ -208,16 +208,16 @@ export function OpeningCinematic({ onComplete }) {
         <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '0 16px' }}>
           <h2 style={{
             fontFamily: 'var(--font-retro)',
-            fontSize: 'clamp(12px, 4vw, 18px)',
+            fontSize: 'clamp(13px, 4.2vw, 19px)',
             color: '#fbbf24',
             marginBottom: 12,
             lineHeight: 1.5,
             textShadow: '0 0 16px rgba(251,191,36,0.8)'
           }}>
-            ✨ Selamat Ulang Tahun Sayang ✨
+            ✨ SELAMAT ULANG TAHUN UDY SAYANG ✨
           </h2>
-          <p style={{ fontFamily: 'var(--font-retro)', fontSize: 10, color: '#f472b6' }}>
-            Langit malam mulai bersinar untukmu...
+          <p style={{ fontFamily: 'var(--font-retro)', fontSize: 'clamp(10px, 3.2vw, 13px)', color: '#f472b6', letterSpacing: 1 }}>
+            SELAMAT MAKINN TUA WKWK 😜
           </p>
         </div>
       )}
@@ -225,11 +225,12 @@ export function OpeningCinematic({ onComplete }) {
       {/* 03. Birthday Reveal */}
       {step === 3 && (
         <div className="ff-window" style={{ position: 'relative', zIndex: 10, padding: '28px 24px', maxWidth: 440, width: '90%', textAlign: 'center' }}>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 24, color: '#fda4af', marginBottom: 12, lineHeight: 1.4 }}>
-            Selamat Ulang Tahun<br />ke-24, Sayang ❤️
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 22, color: '#fda4af', marginBottom: 14, lineHeight: 1.4, fontWeight: 'bold' }}>
+            SELAMAT ULANG TAHUN KE 24 SAYANGKU ❤️
           </h1>
-          <p style={{ fontSize: 14, color: '#e2e8f0', marginBottom: 16 }}>
-            Hari ini dunia merayakan seseorang yang sangat berarti bagiku.
+          <p style={{ fontSize: 14, color: '#e2e8f0', marginBottom: 16, lineHeight: 1.7, fontWeight: 600 }}>
+            SEMOGA SEHAT SELALU PANJANG UMUR.<br />
+            JANGAN TUKANG EMOSIAN, KALO DIAJAK TUKAR PIKIRAN JANGAN NGAMBEK TERUSS! 😜
           </p>
           <div style={{ fontFamily: 'var(--font-retro)', fontSize: 11, color: '#fbbf24', letterSpacing: 2 }}>
             26 NOVEMBER 2026
@@ -282,16 +283,19 @@ export function OpeningCinematic({ onComplete }) {
                 Tiup Lilin 🎂
               </button>
               <button onClick={handleProceedToWorld} className="ff-btn">
-                Jelajahi Dunia Kita ✨
+                JELAJAHI DUNIA KITA ✨
               </button>
             </div>
           ) : (
-            <div className="ff-window" style={{ padding: 18, textAlign: 'center', maxWidth: 360 }}>
-              <p style={{ fontSize: 14, color: '#f1f5f9', lineHeight: 1.6, marginBottom: 14 }}>
-                "Semoga semua harapan baikmu dikabulkan. Aku berharap bisa terus menemanimu merayakan banyak ulang tahun berikutnya. ❤️"
+            <div className="ff-window" style={{ padding: 20, textAlign: 'center', maxWidth: 380 }}>
+              <p style={{ fontSize: 15, color: '#fbbf24', fontWeight: 'bold', lineHeight: 1.6, marginBottom: 8 }}>
+                "SEMOGA PANJANG UMUR SEHAT SELALU SAYANG"
+              </p>
+              <p style={{ fontSize: 14, color: '#f1f5f9', lineHeight: 1.6, marginBottom: 16 }}>
+                "SEMOGA SEMUA YANG DI HARAPKAN TERKABUL, SEMOGA KITA DI LANCARKAN JUGA ❤️"
               </p>
               <button onClick={handleProceedToWorld} className="ff-btn gold">
-                Jelajahi Dunia Kita ✨
+                JELAJAHI DUNIA KITA ✨
               </button>
             </div>
           )}

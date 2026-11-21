@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { getPhotoUrl, getThumbUrl } from '../data/locations';
+import { getPhotoUrl, getThumbUrl, formatPhotoDate } from '../data/locations';
 import { ffAudio } from '../audio/retroAudio';
 
 export function MemoryAlbum({ location, onClose }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [lightboxSrc, setLightboxSrc] = useState(null);
-  const [lightboxCaption, setLightboxCaption] = useState('');
+  const [lightboxData, setLightboxData] = useState(null);
   const reelRef = useRef(null);
 
   useEffect(() => {
@@ -72,20 +71,26 @@ export function MemoryAlbum({ location, onClose }) {
               <div ref={reelRef} onScroll={handleScroll} className="ff-scroll-reel">
                 {location.photos.map((photo, i) => (
                   <div key={i} className="ff-moment-card">
-                    <div className="ff-moment-header">
-                      Momen {i + 1} / {location.photos.length}
+                    <div className="ff-moment-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontWeight: 'bold' }}>{location.name} - {photo.spot}</span>
+                      <span style={{ opacity: 0.75, fontSize: 9 }}>#{i + 1}</span>
                     </div>
+
                     <div
                       onClick={() => {
                         ffAudio.playWindowOpen();
-                        setLightboxSrc(getPhotoUrl(location.folder, photo.file));
-                        setLightboxCaption(photo.caption);
+                        setLightboxData({
+                          src: getPhotoUrl(location.folder, photo.file),
+                          title: `${location.name} - ${photo.spot}`,
+                          date: formatPhotoDate(photo.file),
+                          animeQuote: photo.animeQuote
+                        });
                       }}
                       className="ff-moment-img-box"
                     >
                       <img
                         src={getPhotoUrl(location.folder, photo.file)}
-                        alt={photo.caption}
+                        alt={`${location.name} - ${photo.spot}`}
                         loading="lazy"
                         className="ff-moment-img"
                       />
@@ -97,8 +102,23 @@ export function MemoryAlbum({ location, onClose }) {
                         🔍 Perbesar
                       </span>
                     </div>
-                    <div className="ff-moment-caption-box">
-                      <p className="ff-moment-caption">{photo.caption}</p>
+
+                    <div className="ff-moment-caption-box" style={{ textAlign: 'left', padding: '10px 12px' }}>
+                      <div style={{ fontFamily: 'var(--font-retro)', fontSize: 9, color: '#fbbf24', marginBottom: 5 }}>
+                        📅 {formatPhotoDate(photo.file)}
+                      </div>
+                      <div style={{ fontSize: 13, color: '#f8fafc', fontStyle: 'italic', marginBottom: 6, fontWeight: 600 }}>
+                        "Lucu juga kita ya wkwk."
+                      </div>
+                      <div style={{
+                        fontSize: 12, color: '#93c5fd', borderTop: '1px dashed rgba(255,255,255,0.2)',
+                        paddingTop: 6, lineHeight: 1.4
+                      }}>
+                        "{photo.animeQuote.quote}"
+                        <div style={{ color: '#fbbf24', fontWeight: 'bold', fontSize: 10, marginTop: 4, fontFamily: 'var(--font-retro)' }}>
+                          — by {photo.animeQuote.by}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -142,21 +162,37 @@ export function MemoryAlbum({ location, onClose }) {
       </div>
 
       {/* Lightbox Modal */}
-      {lightboxSrc && (
+      {lightboxData && (
         <div
-          onClick={() => setLightboxSrc(null)}
+          onClick={() => setLightboxData(null)}
           className="ff-lightbox-overlay"
         >
           <button
-            onClick={() => setLightboxSrc(null)}
+            onClick={() => setLightboxData(null)}
             className="ff-btn-close"
             style={{ position: 'absolute', top: 16, right: 16, zIndex: 1100, width: 34, height: 34 }}
           >
             ✕
           </button>
-          <div className="ff-lightbox-inner">
-            <img src={lightboxSrc} alt="Full view" className="ff-lightbox-img" />
-            <p className="ff-lightbox-caption">{lightboxCaption}</p>
+          <div className="ff-lightbox-inner" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 440, width: '92%' }}>
+            <img src={lightboxData.src} alt={lightboxData.title} className="ff-lightbox-img" style={{ maxHeight: '60vh', objectFit: 'contain', borderRadius: 6 }} />
+            <div style={{ background: '#020617', padding: '12px 14px', borderRadius: '0 0 6px 6px', border: '1px solid #38bdf8' }}>
+              <div style={{ fontFamily: 'var(--font-retro)', fontSize: 11, color: '#38bdf8', marginBottom: 4 }}>
+                {lightboxData.title}
+              </div>
+              <div style={{ fontFamily: 'var(--font-retro)', fontSize: 9, color: '#fbbf24', marginBottom: 6 }}>
+                📅 {lightboxData.date}
+              </div>
+              <div style={{ fontSize: 13, color: '#f8fafc', fontStyle: 'italic', marginBottom: 6, fontWeight: 600 }}>
+                "Lucu juga kita ya wkwk."
+              </div>
+              <div style={{ fontSize: 12, color: '#93c5fd', borderTop: '1px dashed rgba(255,255,255,0.2)', paddingTop: 6, lineHeight: 1.4 }}>
+                "{lightboxData.animeQuote.quote}"
+                <div style={{ color: '#fbbf24', fontWeight: 'bold', fontSize: 10, marginTop: 4, fontFamily: 'var(--font-retro)' }}>
+                  — by {lightboxData.animeQuote.by}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
