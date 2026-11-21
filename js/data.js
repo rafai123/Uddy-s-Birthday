@@ -1,4 +1,6 @@
-// Data Kenangan & Lokasi Spesial
+// Data Kenangan, Lokasi Spesial & Konfigurasi Retro Map
+// Berdasarkan Dokumen Desain UX & Layar Infografis: a_detailed_infographic_ux_design_document_layout_o.png
+
 export const LOCATIONS_DATA = [
   {
     id: 1,
@@ -9,7 +11,7 @@ export const LOCATIONS_DATA = [
     quote: "\"Di antara tenangnya riak air dan sejuknya angin danau, ada hatiku yang selalu menemukan kedamaian bersamamu.\"",
     folder: "Samosir",
     icon: "⛵",
-    coords: { x: 380, y: 320 }, // Lokasi pada kanvas peta
+    coords: { x: 420, y: 350 }, // Lokasi pulau/dermaga Danau Toba (kiri atas)
     themeColor: "#38bdf8",
     photos: [
       { file: "P_20260709_134413.jpg", caption: "Awal perjalanan kita menyeberang menuju Samosir." },
@@ -33,7 +35,7 @@ export const LOCATIONS_DATA = [
     quote: "\"Setinggi apa pun puncak yang kita tatap, aku tahu perjalanan hidup akan selalu terasa ringan karena ada kamu di sampingku.\"",
     folder: "Gunung",
     icon: "🏔️",
-    coords: { x: 300, y: 560 },
+    coords: { x: 260, y: 640 }, // Lereng perbukitan Sinabung (kiri tengah)
     themeColor: "#f59e0b",
     photos: [
       { file: "P_20260511_152727.jpg", caption: "Perjalanan mendaki bukit dengan semangat kita berdua." },
@@ -57,7 +59,7 @@ export const LOCATIONS_DATA = [
     quote: "\"Seperti ombak yang selalu setia kembali memeluk pantai, begitu pula perasaanku yang tak pernah berhenti pulang kepadamu.\"",
     folder: "Pantai",
     icon: "🏖️",
-    coords: { x: 700, y: 460 },
+    coords: { x: 960, y: 380 }, // Garis pantai pasir keemasan (kanan atas)
     themeColor: "#ec4899",
     photos: [
       { file: "P_20260617_181343.jpg", caption: "Suara ombak pertama yang menyambut kita di pantai." },
@@ -87,7 +89,7 @@ export const LOCATIONS_DATA = [
     quote: "\"Bahagia itu sederhana: berjalan berdua di tempat yang tenang, membicarakan hal-hal kecil, dan tertawa bersama.\"",
     folder: "Meat",
     icon: "🌾",
-    coords: { x: 520, y: 640 },
+    coords: { x: 580, y: 1040 }, // Lembah pedesaan hijau (tengah bawah)
     themeColor: "#10b981",
     photos: [
       { file: "P_20260528_170422.jpg", caption: "Suasana tenang di sudut desa Meat yang asri." },
@@ -108,7 +110,7 @@ export const LOCATIONS_DATA = [
     quote: "\"Melihat dunia seluas ini dari atas tebing membuatku sadar, di antara jutaan manusia, aku paling bersyukur menemukanmu.\"",
     folder: "Tongging",
     icon: "🏞️",
-    coords: { x: 760, y: 260 },
+    coords: { x: 960, y: 780 }, // Puncak tebing menghadap danau (kanan tengah)
     themeColor: "#8b5cf6",
     photos: [
       { file: "P_20261028_130503.jpg", caption: "Tiba di tebing Tongging dengan panorama luas memukau." },
@@ -135,7 +137,7 @@ export const SECRET_AREA = {
   id: 6,
   name: "Our Little Universe",
   subtitle: "Puncak Bintang & Surat Khusus",
-  coords: { x: 500, y: 150 },
+  coords: { x: 580, y: 1420 }, // Pulau kosmik terapung di bagian paling bawah peta
   icon: "🌌",
   letterTitle: "Untuk Kamu yang Paling Berarti ❤️",
   letterBody: `Selamat Ulang Tahun yang ke-24, Sayang...
@@ -146,7 +148,7 @@ Melihat kembali semua jejak perjalanan kita — dari dinginnya perbukitan Sinabu
 
 Di setiap tempat yang kita datangi, bukan pemandangannya yang membuatnya begitu indah, melainkan kehadiranmu di sampingku. Senyummu, tawamu, bahkan celoteh manjamu adalah hal paling berharga yang selalu menerangi setiap hariku.
 
-Dunia kecil ini aku bangun khusus untuk merangkum sebagian dari kenangan manis yang telah kita ukir bersama. Semoga di usiamu yang ke-24 ini:
+Dunia kecil bergaya retro ini aku persembahkan khusus untuk merangkum momen-momen manis yang telah kita ukir bersama. Semoga di usiamu yang ke-24 ini:
 ✨ Semua impian dan harapan baikmu dimudahkan dan dikabulkan.
 ✨ Kamu senantiasa diberikan kesehatan, kebahagiaan, dan kedamaian hati.
 ✨ Langkahmu selalu dipenuhi cinta dan hal-hal yang membahagiakanmu.
@@ -157,3 +159,12 @@ Selamat Ulang Tahun ke-24, Sayangku.
 I love you to the moon, through all the stars, and back again. ❤️✨`,
   date: "26 November 2026"
 };
+
+// Helper untuk mendapatkan URL gambar optimal dan thumbnail
+export function getPhotoUrl(folder, filename) {
+  return `optimized/${folder}/${filename}`;
+}
+
+export function getThumbUrl(folder, filename) {
+  return `optimized/${folder}/thumb_${filename}`;
+}

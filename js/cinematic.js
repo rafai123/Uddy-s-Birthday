@@ -1,419 +1,358 @@
-// Opening Cinematic Controller: Romantic Loading, Fireworks, Cake, Blowing Candles, Portal Transition
-import { audio } from "./audio.js";
+// Opening Cinematic 5-Step Experience (Persis Dokumen Desain UX Infografis)
+// 01 Romantic Loading -> 02 Fireworks -> 03 Birthday Reveal -> 04 Cake & Choice -> 05 Transition to World
+
+import { retroAudio } from "./audio.js";
 import { storage } from "./storage.js";
 
-export class CinematicController {
+export class CinematicIntro {
   constructor({ onComplete }) {
     this.onComplete = onComplete;
     this.container = document.getElementById("cinematic-layer");
+    this.btnSkip = document.getElementById("btn-skip-intro");
     this.canvas = document.getElementById("cinematic-canvas");
     this.ctx = this.canvas.getContext("2d");
-    
-    // Screens / phases
+
+    // Layar-layar Cinematic
     this.screenLoading = document.getElementById("screen-loading");
     this.screenFireworks = document.getElementById("screen-fireworks");
     this.screenReveal = document.getElementById("screen-reveal");
     this.screenCake = document.getElementById("screen-cake");
     this.screenTransition = document.getElementById("screen-transition");
-    this.btnSkip = document.getElementById("btn-skip-intro");
 
-    // Cake elements
-    this.cakeContainer = document.getElementById("cake-container");
+    // Elemen Interaksi Kue & Lilin
     this.cakeStage = document.getElementById("cake-stage");
+    this.candlesRow = document.getElementById("candles-row");
     this.btnBlow = document.getElementById("btn-blow-candles");
     this.btnExploreDirect = document.getElementById("btn-explore-direct");
-    this.windEffect = document.getElementById("wind-effect");
-    this.heartMessage = document.getElementById("heart-message-box");
     this.btnExploreAfterBlow = document.getElementById("btn-explore-after-blow");
+    this.windEffect = document.getElementById("wind-effect");
+    this.heartMessageBox = document.getElementById("heart-message-box");
+    this.cakeChoices = document.querySelector(".cake-choices");
 
-    // Particle pool for fireworks & confetti
+    // Partikel Kembang Api & Bintang
     this.particles = [];
-    this.particlePool = [];
-    this.rockets = [];
-    this.confetti = [];
-    this.isRunning = true;
-    this.animationId = null;
+    this.fireworks = [];
+    this.animId = null;
+    this.isActive = true;
+    this.timers = [];
 
-    this.candleCount = 24;
-    this.candleElements = [];
+    this.candles = [];
+    this.currentStep = 1;
 
-    this.initCanvasSize();
-    window.addEventListener("resize", () => this.initCanvasSize());
+    this.resize();
+    window.addEventListener("resize", () => this.resize());
+    this.initEvents();
   }
 
-  initCanvasSize() {
+  resize() {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
   }
 
-  start() {
-    this.renderCandles();
-    this.bindEvents();
-    this.startLoop();
-    this.runSequence();
-  }
-
-  bindEvents() {
+  initEvents() {
+    // Tombol Lewati Intro
     this.btnSkip.addEventListener("click", () => {
-      audio.unlock();
-      audio.playClick();
-      this.finishCinematic();
+      retroAudio.playButtonClick();
+      this.finishIntro();
     });
 
+    // Pilihan 1: Tiup Lilin
     this.btnBlow.addEventListener("click", () => {
-      audio.unlock();
       this.handleBlowCandles();
     });
 
+    // Pilihan 2: Langsung Masuk ke Dunia
     this.btnExploreDirect.addEventListener("click", () => {
-      audio.unlock();
-      audio.playClick();
-      this.triggerWorldTransition();
+      retroAudio.playButtonClick();
+      this.playTransitionToWorld();
     });
 
+    // Tombol Jelajah setelah Lilin Ditiup
     this.btnExploreAfterBlow.addEventListener("click", () => {
-      audio.unlock();
-      audio.playClick();
-      this.triggerWorldTransition();
+      retroAudio.playButtonClick();
+      this.playTransitionToWorld();
     });
   }
 
-  // Render 24 Lilin di kue ulang tahun (SVG/DOM)
-  renderCandles() {
-    const candlesRow = document.getElementById("candles-row");
-    candlesRow.innerHTML = "";
-    this.candleElements = [];
+  start() {
+    this.isActive = true;
+    this.container.classList.add("active");
+    this.createCandles(24);
+    this.startCanvasLoop();
 
-    for (let i = 0; i < this.candleCount; i++) {
-      const candle = document.createElement("div");
-      candle.className = "candle";
-      candle.dataset.index = i;
-
-      // Candle body + wick + flame + smoke
-      candle.innerHTML = `
-        <div class="candle-flame">
-          <div class="flame-core"></div>
-        </div>
-        <div class="candle-smoke"></div>
-        <div class="candle-wick"></div>
-        <div class="candle-stick" style="background: hsl(${(i * 15) % 360}, 85%, 72%)"></div>
-      `;
-      candlesRow.appendChild(candle);
-      this.candleElements.push(candle);
-    }
+    // Jalankan Alur 5 Tahap Sesuai Infografis
+    this.step01_RomanticLoading();
   }
 
-  // Timeline Alur Sinematik Otomatis
-  runSequence() {
-    // 01. Romantic Loading (3.5s)
+  // 01. Romantic Loading (3-4 detik)
+  step01_RomanticLoading() {
     this.showScreen(this.screenLoading);
 
-    setTimeout(() => {
-      if (!this.isRunning) return;
-      // 02. Fireworks Celebration
-      this.showScreen(this.screenFireworks);
-      this.launchCelebrationFireworks(12);
-
-      setTimeout(() => {
-        if (!this.isRunning) return;
-        // 03. Birthday Reveal
-        this.showScreen(this.screenReveal);
-        this.launchCelebrationFireworks(6);
-
-        setTimeout(() => {
-          if (!this.isRunning) return;
-          // 04. Cake & Choices
-          this.showScreen(this.screenCake);
-          this.cakeContainer.classList.add("appear");
-        }, 4000);
-      }, 4500);
-    }, 3200);
+    const timer = setTimeout(() => {
+      if (!this.isActive) return;
+      this.step02_FireworksCelebration();
+    }, 3500);
+    this.timers.push(timer);
   }
 
-  showScreen(targetScreen) {
-    [this.screenLoading, this.screenFireworks, this.screenReveal, this.screenCake, this.screenTransition].forEach((s) => {
-      if (s) {
-        s.classList.remove("active");
-        s.style.opacity = "0";
-        s.style.pointerEvents = "none";
-      }
-    });
+  // 02. Fireworks Celebration (4-5 detik)
+  step02_FireworksCelebration() {
+    this.showScreen(this.screenFireworks);
 
-    if (targetScreen) {
-      targetScreen.classList.add("active");
-      targetScreen.style.opacity = "1";
-      targetScreen.style.pointerEvents = "auto";
-    }
-  }
-
-  // Interaksi Tiup Lilin
-  handleBlowCandles() {
-    this.btnBlow.disabled = true;
-    this.btnBlow.style.opacity = "0.5";
-    audio.playBlowSound();
-
-    // A. Zoom ke Kue
-    this.cakeStage.classList.add("zoom-in");
-
-    // B. Tiupan Angin (hembusan dari kiri ke kanan)
-    this.windEffect.classList.add("active");
-
-    // C. Lilin padam berurutan dari kiri ke kanan
-    const delayPerCandle = 90; // ms
-    this.candleElements.forEach((candle, idx) => {
-      setTimeout(() => {
-        const flame = candle.querySelector(".candle-flame");
-        const smoke = candle.querySelector(".candle-smoke");
-        if (flame) flame.classList.add("extinguished");
-        if (smoke) smoke.classList.add("puff");
-        if (idx % 3 === 0) audio.playExtinguish();
-      }, 400 + idx * delayPerCandle);
-    });
-
-    // D. Confetti, Cahaya & Pesan Hati setelah semua lilin padam
-    const totalTime = 400 + this.candleCount * delayPerCandle + 300;
-    setTimeout(() => {
-      storage.setCandlesBlown(true);
-      this.windEffect.classList.remove("active");
-      this.cakeStage.classList.add("glow-soft");
-      
-      // Ledakan Confetti
-      this.spawnConfettiBurst();
-      audio.playChime();
-
-      // Tampilkan Pesan Hati
-      setTimeout(() => {
-        this.heartMessage.classList.add("visible");
-      }, 700);
-    }, totalTime);
-  }
-
-  // 05. Portal Transisi ke Game World
-  triggerWorldTransition() {
-    this.showScreen(this.screenTransition);
-    audio.playChime();
-
-    const portal = document.getElementById("portal-vortex");
-    if (portal) portal.classList.add("expand");
-
-    setTimeout(() => {
-      this.finishCinematic();
-    }, 2200);
-  }
-
-  finishCinematic() {
-    this.isRunning = false;
-    storage.setIntroWatched(true);
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-    }
-    this.container.classList.add("fade-out");
-    setTimeout(() => {
-      this.container.style.display = "none";
-      if (this.onComplete) {
-        this.onComplete();
-      }
-    }, 1000);
-  }
-
-  // Kembang Api Canvas 2D
-  launchCelebrationFireworks(count = 8) {
-    let fired = 0;
-    const interval = setInterval(() => {
-      if (!this.isRunning || fired >= count) {
-        clearInterval(interval);
+    // Luncurkan pesta kembang api retro berkilau
+    let count = 0;
+    const fwInterval = setInterval(() => {
+      if (!this.isActive || count > 8) {
+        clearInterval(fwInterval);
         return;
       }
-      const x = Math.random() * (this.canvas.width * 0.8) + this.canvas.width * 0.1;
-      const targetY = Math.random() * (this.canvas.height * 0.45) + this.canvas.height * 0.15;
-      this.rockets.push(new Rocket(x, this.canvas.height, targetY, () => {
-        this.createExplosion(x, targetY);
-        audio.playFirework();
-      }));
-      fired++;
-    }, 400);
+      this.spawnFirework();
+      retroAudio.playFireworkBoom();
+      count++;
+    }, 450);
+
+    const timer = setTimeout(() => {
+      if (!this.isActive) return;
+      this.step03_BirthdayReveal();
+    }, 4800);
+    this.timers.push(timer);
   }
 
-  createExplosion(x, y) {
-    const colors = ["#ff3366", "#ff9933", "#ffff33", "#33ccff", "#cc33ff", "#ff66cc", "#ffeedd"];
-    const particleCount = 65;
-    for (let i = 0; i < particleCount; i++) {
-      const angle = (Math.PI * 2 * i) / particleCount;
-      const speed = Math.random() * 4.5 + 2;
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const isHeart = Math.random() < 0.25;
+  // 03. Birthday Reveal (3-4 detik)
+  step03_BirthdayReveal() {
+    this.showScreen(this.screenReveal);
+    retroAudio.playSparkleChime();
 
-      let p = this.particlePool.pop();
-      if (!p) {
-        p = new Particle();
-      }
-      p.init(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, color, isHeart);
-      this.particles.push(p);
+    // Taburkan partikel hati melayang
+    for (let i = 0; i < 20; i++) {
+      this.spawnHeartSparkle(
+        Math.random() * this.canvas.width,
+        Math.random() * this.canvas.height
+      );
     }
+
+    const timer = setTimeout(() => {
+      if (!this.isActive) return;
+      this.step04_CakeAndChoices();
+    }, 4200);
+    this.timers.push(timer);
   }
 
-  spawnConfettiBurst() {
-    const colors = ["#ff3b69", "#ffaa00", "#ffd700", "#00d2ff", "#b026ff", "#00f0aa", "#ffffff"];
-    for (let i = 0; i < 140; i++) {
-      this.confetti.push({
-        x: this.canvas.width / 2 + (Math.random() * 80 - 40),
-        y: this.canvas.height * 0.65,
-        vx: (Math.random() - 0.5) * 12,
-        vy: -Math.random() * 14 - 4,
-        size: Math.random() * 8 + 4,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        rotation: Math.random() * 360,
-        vRot: (Math.random() - 0.5) * 15,
-        alpha: 1
+  // 04. Cake & Interactive Choices (Interaktif Lilin)
+  step04_CakeAndChoices() {
+    this.showScreen(this.screenCake);
+  }
+
+  // Interaksi Tiup Lilin (A, B, C, D, E per Dokumen Desain)
+  handleBlowCandles() {
+    this.btnBlow.disabled = true;
+    this.btnExploreDirect.disabled = true;
+
+    // A. Kamera Mendekat (Zoom in ke kue)
+    this.cakeStage.classList.add("zoomed");
+
+    // B. Tiupan Angin & SFX
+    retroAudio.playCandleBlow();
+    this.windEffect.classList.add("active");
+
+    // C. 24 Lilin Padam Berurutan dengan Efek Asap Kecil
+    let delay = 200;
+    this.candles.forEach((candle, idx) => {
+      setTimeout(() => {
+        candle.extinguish();
+      }, delay + (idx * 55));
+    });
+
+    // D. Confetti, Bintang & Kilau Cahaya Lembut
+    setTimeout(() => {
+      this.windEffect.classList.remove("active");
+      retroAudio.playFireworkBoom();
+
+      // Ledakan confetti warna-warni
+      const cakeRect = this.cakeStage.getBoundingClientRect();
+      const originX = cakeRect.left + cakeRect.width / 2;
+      const originY = cakeRect.top + cakeRect.height / 2;
+      this.spawnConfettiBurst(originX, originY, 80);
+
+      // E. Pesan Hati Muncul
+      storage.markCandlesBlown();
+      this.cakeChoices.style.display = "none";
+      this.heartMessageBox.classList.add("visible");
+    }, delay + (this.candles.length * 55) + 400);
+  }
+
+  // 05. Transition to World (2-3 detik)
+  playTransitionToWorld() {
+    this.showScreen(this.screenTransition);
+    retroAudio.playSparkleChime();
+
+    // Mulai musik BGM petualangan romantis sekarang
+    retroAudio.startBGM();
+
+    setTimeout(() => {
+      this.finishIntro();
+    }, 2400);
+  }
+
+  finishIntro() {
+    this.isActive = false;
+    this.clearAllTimers();
+    storage.markIntroWatched();
+
+    // Sembunyikan layer intro dengan transisi lembut
+    this.container.classList.remove("active");
+    this.container.style.opacity = "0";
+    setTimeout(() => {
+      this.container.style.display = "none";
+      if (this.animId) cancelAnimationFrame(this.animId);
+      if (this.onComplete) this.onComplete();
+    }, 500);
+  }
+
+  showScreen(screenEl) {
+    [
+      this.screenLoading,
+      this.screenFireworks,
+      this.screenReveal,
+      this.screenCake,
+      this.screenTransition
+    ].forEach((s) => s.classList.remove("active"));
+
+    screenEl.classList.add("active");
+  }
+
+  createCandles(count) {
+    this.candlesRow.innerHTML = "";
+    this.candles = [];
+
+    for (let i = 0; i < count; i++) {
+      const candleEl = document.createElement("div");
+      candleEl.className = "pixel-candle";
+
+      const flameEl = document.createElement("div");
+      flameEl.className = "candle-flame";
+
+      const smokeEl = document.createElement("div");
+      smokeEl.className = "candle-smoke";
+
+      candleEl.appendChild(flameEl);
+      candleEl.appendChild(smokeEl);
+      this.candlesRow.appendChild(candleEl);
+
+      this.candles.push({
+        element: candleEl,
+        flame: flameEl,
+        smoke: smokeEl,
+        extinguish: () => {
+          flameEl.classList.add("out");
+          smokeEl.classList.add("puff");
+        }
       });
     }
   }
 
-  // Loop requestAnimationFrame
-  startLoop() {
-    const loop = () => {
-      if (!this.isRunning) return;
+  clearAllTimers() {
+    this.timers.forEach((t) => clearTimeout(t));
+    this.timers = [];
+  }
+
+  // ==========================================
+  // PARTIKEL KEMBANG API & CONFETTI CANVAS
+  // ==========================================
+  spawnFirework() {
+    const x = Math.random() * (this.canvas.width * 0.7) + (this.canvas.width * 0.15);
+    const y = Math.random() * (this.canvas.height * 0.45) + (this.canvas.height * 0.1);
+    const colors = ["#f43f5e", "#fbbf24", "#38bdf8", "#ec4899", "#a855f7", "#34d399"];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+
+    const particleCount = 45;
+    for (let i = 0; i < particleCount; i++) {
+      const angle = (Math.PI * 2 * i) / particleCount;
+      const speed = Math.random() * 5 + 2;
+      this.particles.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        color: color,
+        alpha: 1.0,
+        decay: Math.random() * 0.02 + 0.015,
+        size: Math.random() * 3 + 2,
+        isHeart: Math.random() < 0.25
+      });
+    }
+  }
+
+  spawnConfettiBurst(x, y, count) {
+    const colors = ["#f43f5e", "#fbbf24", "#38bdf8", "#ec4899", "#ffffff", "#34d399"];
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 7 + 2;
+      this.particles.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 3, // Dorongan ke atas
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: 1.0,
+        decay: Math.random() * 0.015 + 0.01,
+        size: Math.random() * 4 + 3,
+        gravity: 0.15,
+        rotation: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 10
+      });
+    }
+  }
+
+  spawnHeartSparkle(x, y) {
+    this.particles.push({
+      x: x,
+      y: y,
+      vx: (Math.random() - 0.5) * 1.5,
+      vy: -Math.random() * 2 - 0.5,
+      color: "#f43f5e",
+      alpha: 1.0,
+      decay: 0.01,
+      size: 16,
+      isHeart: true
+    });
+  }
+
+  startCanvasLoop() {
+    const render = () => {
+      if (!this.isActive) return;
 
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-      // Render Rockets
-      for (let i = this.rockets.length - 1; i >= 0; i--) {
-        const r = this.rockets[i];
-        r.update();
-        r.draw(this.ctx);
-        if (r.dead) {
-          this.rockets.splice(i, 1);
-        }
-      }
-
-      // Render Explosion Particles
       for (let i = this.particles.length - 1; i >= 0; i--) {
         const p = this.particles[i];
-        p.update();
-        p.draw(this.ctx);
-        if (p.dead) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.gravity) p.vy += p.gravity;
+        p.alpha -= p.decay;
+
+        if (p.alpha <= 0) {
           this.particles.splice(i, 1);
-          if (this.particlePool.length < 200) {
-            this.particlePool.push(p);
-          }
-        }
-      }
-
-      // Render Confetti
-      for (let i = this.confetti.length - 1; i >= 0; i--) {
-        const c = this.confetti[i];
-        c.x += c.vx;
-        c.y += c.vy;
-        c.vy += 0.28; // gravity
-        c.vx *= 0.98;
-        c.rotation += c.vRot;
-        c.alpha -= 0.007;
-
-        if (c.alpha <= 0 || c.y > this.canvas.height + 20) {
-          this.confetti.splice(i, 1);
           continue;
         }
 
         this.ctx.save();
-        this.ctx.globalAlpha = Math.max(0, c.alpha);
-        this.ctx.translate(c.x, c.y);
-        this.ctx.rotate((c.rotation * Math.PI) / 180);
-        this.ctx.fillStyle = c.color;
-        this.ctx.fillRect(-c.size / 2, -c.size / 2, c.size, c.size * 0.6);
+        this.ctx.globalAlpha = p.alpha;
+        if (p.isHeart) {
+          this.ctx.fillStyle = p.color;
+          this.ctx.font = `${p.size}px sans-serif`;
+          this.ctx.textAlign = "center";
+          this.ctx.fillText("♥", p.x, p.y);
+        } else {
+          this.ctx.fillStyle = p.color;
+          this.ctx.fillRect(p.x, p.y, p.size, p.size);
+        }
         this.ctx.restore();
       }
 
-      this.animationId = requestAnimationFrame(loop);
+      this.animId = requestAnimationFrame(render);
     };
 
-    this.animationId = requestAnimationFrame(loop);
-  }
-}
-
-// Helper Class: Rocket
-class Rocket {
-  constructor(x, y, targetY, onExplode) {
-    this.x = x;
-    this.y = y;
-    this.targetY = targetY;
-    this.vy = -Math.random() * 3 - 9;
-    this.dead = false;
-    this.onExplode = onExplode;
-  }
-
-  update() {
-    this.y += this.vy;
-    if (this.y <= this.targetY) {
-      this.dead = true;
-      if (this.onExplode) this.onExplode();
-    }
-  }
-
-  draw(ctx) {
-    ctx.save();
-    ctx.fillStyle = "#fff8db";
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Spark trail
-    ctx.strokeStyle = "rgba(255, 200, 100, 0.4)";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y);
-    ctx.lineTo(this.x, this.y + 12);
-    ctx.stroke();
-    ctx.restore();
-  }
-}
-
-// Helper Class: Particle
-class Particle {
-  init(x, y, vx, vy, color, isHeart = false) {
-    this.x = x;
-    this.y = y;
-    this.vx = vx;
-    this.vy = vy;
-    this.color = color;
-    this.isHeart = isHeart;
-    this.alpha = 1;
-    this.decay = Math.random() * 0.015 + 0.012;
-    this.size = Math.random() * 3.5 + 2;
-    this.gravity = 0.09;
-    this.dead = false;
-  }
-
-  update() {
-    this.x += this.vx;
-    this.y += this.vy;
-    this.vy += this.gravity;
-    this.vx *= 0.98;
-    this.alpha -= this.decay;
-    if (this.alpha <= 0) {
-      this.dead = true;
-    }
-  }
-
-  draw(ctx) {
-    if (this.dead) return;
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, this.alpha);
-    ctx.fillStyle = this.color;
-
-    if (this.isHeart) {
-      // Draw tiny heart shape
-      ctx.translate(this.x, this.y);
-      ctx.beginPath();
-      const s = this.size * 0.8;
-      ctx.moveTo(0, 0);
-      ctx.bezierCurveTo(-s, -s, -s * 2, s / 3, 0, s * 1.6);
-      ctx.bezierCurveTo(s * 2, s / 3, s, -s, 0, 0);
-      ctx.fill();
-    } else {
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
+    render();
   }
 }

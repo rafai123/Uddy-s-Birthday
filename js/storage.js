@@ -1,99 +1,78 @@
-// LocalStorage Manager untuk Progres & State Game
-const STORAGE_KEY = "ultah_udy_progress_v1";
+// Pengelola Progres Eksplorasi Kenangan (LocalStorage Persistence)
 
-const defaultState = {
-  birthdayIntroWatched: false,
-  candlesBlown: false,
-  locationsUnlocked: [], // id array [1, 2, 3, 4, 5]
-  journalEntries: [],
-  secretUnlocked: false,
-  musicUnlocked: false,
-  soundMuted: false
-};
+const STORAGE_KEY = "udy_birthday_progress_v2";
 
 class StorageManager {
   constructor() {
-    this.state = this.load();
+    this.data = this.load();
+  }
+
+  getDefaults() {
+    return {
+      visitedLocations: [],       // Array id lokasi yang sudah dikunjungi [1..5]
+      candlesBlown: false,        // Lilin kue ditiup
+      introWatched: false,        // Sudah melewati cinematic intro
+      secretUnlocked: false,      // Area rahasia terbuka
+      firstPlayedAt: new Date().toISOString()
+    };
   }
 
   load() {
     try {
-      const data = localStorage.getItem(STORAGE_KEY);
-      if (data) {
-        return { ...defaultState, ...JSON.parse(data) };
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        return { ...this.getDefaults(), ...JSON.parse(raw) };
       }
     } catch (e) {
-      console.warn("Could not read localStorage:", e);
+      console.warn("Gagal memuat dari localStorage", e);
     }
-    return { ...defaultState };
+    return this.getDefaults();
   }
 
   save() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
     } catch (e) {
-      console.warn("Could not write localStorage:", e);
+      console.warn("Gagal menyimpan ke localStorage", e);
     }
   }
 
-  isIntroWatched() {
-    return this.state.birthdayIntroWatched;
+  isLocationVisited(id) {
+    return this.data.visitedLocations.includes(id);
   }
 
-  setIntroWatched(val = true) {
-    this.state.birthdayIntroWatched = val;
-    this.save();
-  }
-
-  isCandlesBlown() {
-    return this.state.candlesBlown;
-  }
-
-  setCandlesBlown(val = true) {
-    this.state.candlesBlown = val;
-    this.save();
-  }
-
-  isLocationUnlocked(id) {
-    return this.state.locationsUnlocked.includes(id);
-  }
-
-  unlockLocation(id) {
-    if (!this.state.locationsUnlocked.includes(id)) {
-      this.state.locationsUnlocked.push(id);
-      if (this.state.locationsUnlocked.length >= 5) {
-        this.state.secretUnlocked = true;
+  markLocationVisited(id) {
+    if (!this.data.visitedLocations.includes(id)) {
+      this.data.visitedLocations.push(id);
+      if (this.data.visitedLocations.length >= 5) {
+        this.data.secretUnlocked = true;
       }
       this.save();
-      return true; // newly unlocked
+      return true; // Lokasi baru pertama kali dibuka!
     }
     return false;
   }
 
-  getUnlockedLocations() {
-    return this.state.locationsUnlocked;
+  getVisitedCount() {
+    return this.data.visitedLocations.length;
   }
 
   isSecretUnlocked() {
-    return this.state.secretUnlocked || this.state.locationsUnlocked.length >= 5;
+    return this.data.visitedLocations.length >= 5 || this.data.secretUnlocked;
   }
 
-  setSecretUnlocked(val = true) {
-    this.state.secretUnlocked = val;
+  markCandlesBlown() {
+    this.data.candlesBlown = true;
     this.save();
   }
 
-  isMuted() {
-    return this.state.soundMuted;
-  }
-
-  setMuted(val) {
-    this.state.soundMuted = val;
+  markIntroWatched() {
+    this.data.introWatched = true;
     this.save();
   }
 
-  resetAll() {
-    this.state = { ...defaultState };
+  resetProgress() {
+    this.data = this.getDefaults();
     this.save();
   }
 }

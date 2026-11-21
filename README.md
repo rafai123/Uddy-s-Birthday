@@ -1,89 +1,81 @@
-# 🎉 Selamat Ulang Tahun ke-24, Sayang ❤️ | Dunia Kenangan Kita
+# 🗡️ Dunia Kenangan Kita - Retro Game Edition (Forgotten Warrior Style)
+### Spesial Perayaan Ulang Tahun ke-24 untuk Sayang ❤️ (26 November 2026)
 
-Aplikasi web interaktif spesial perayaan ulang tahun ke-24, dibangun berdasarkan dokumen desain & layout UX [a_detailed_infographic_ux_design_document_layout_o.png](a_detailed_infographic_ux_design_document_layout_o.png).
+Aplikasi web interaktif bertema retro game klasik (estetika petualangan 16-bit ala *Forgotten Warrior* / game Java J2ME), dibangun sepenuhnya berdasarkan dokumen desain UX & tata letak peta [a_detailed_infographic_ux_design_document_layout_o.png](a_detailed_infographic_ux_design_document_layout_o.png).
+
+---
+
+## ✨ Fitur Utama & Pembaruan
+
+### 1. 🎨 Grafis Retro 16-Bit Ala Forgotten Warrior
+- **Visual Retro Nostalgia**: Desain visual klasik dengan tekstur ubin lanskap, bebatuan kuno, danau Danau Toba dengan riak ombak animasi, perahu kayu dermaga Samosir, bukit Sinabung, pantai pasir keemasan, lembah asri desa Meat, dan tebing megah Tongging.
+- **Efek Partikel Alam Romantis**: Hembusan kelopak bunga sakura merah muda (*cherry blossom*), partikel hati melayang (*floating romantic hearts*), dan kunang-kunang malam yang bersinar lembut di atas danau.
+- **Tata Cahaya Obor & Lentera**: Obor kuno (*torchlights*) berkedip dengan pendar cahaya hangat di sepanjang jalur batu setapak.
+
+### 2. 🧕 Karakter Pemain Sesuai Foto Kekasih
+- Karakter pixel art perempuan imut yang dirancang khusus menyerupai foto asli sang kekasih:
+  - Mengenakan **jilbab pashmina hitam rapi**.
+  - **Kacamata bulat berbingkai emas** yang khas dan manis.
+  - Wajah manis dengan senyum hangat dan rona pipi (*blush*).
+  - Pakaian petualang hoodie/jaket elegan dan celana santai.
+  - Animasi berjalan 4 arah (Depan, Belakang, Kiri, Kanan) dengan langkah kaki halus.
+  - **Avatar Portrait 16-Bit** berbingkai ganda kayu & emas retro di sudut HUD atas.
+
+### 3. 📱 Dioptimalkan Penuh untuk Tampilan & Sentuhan Android
+- **Virtual D-Pad / Joystick**: Thumb stick analog responsif di pojok kiri bawah layar, dirancang khusus untuk jempol satu tangan di HP.
+- **Tombol Aksi [A] Retro**: Tombol arkade tactile besar di kanan bawah dengan efek tekan, pendar cahaya saat dekat lokasi, dan getaran haptic feedback (`vibrate`) di Android.
+- **Tap-to-Walk**: Bisa langsung mengetuk area mana pun di peta layar sentuh untuk membuat karakter berjalan ke titik tersebut dengan penanda hati berkilau.
+- **Tanpa Python di Website**: 100% menggunakan teknologi web murni JavaScript/HTML5 modern tanpa ketergantungan runtime Python.
+
+### 4. 🖼️ Model Scroll Album Foto & Optimasi Ukuran (Super Ringan)
+- **Kompresi Pintar 95.2%**: 58 foto momen perjalanan yang awalnya berukuran total **253.6 MB** telah dioptimalkan secara cerdas menjadi hanya **12.14 MB** (menghemat ~95% bandwidth dan memori HP Android sehingga tidak akan lag ataupun force close).
+- **Model Scroll Reel**: Foto-foto ditampilkan dalam format gulungan horizontal (*horizontal scroll reel*) dengan gestur usap (*touch swipe*), magnetik *scroll-snap*, kartu momen vintage, dan tombol navigasi [◀ Prev] [Next ▶].
+- **Filmstrip Thumbnail**: Strip pratinjau thumbnail instan di bagian bawah album untuk melompat langsung ke momen tertentu.
+- **Fullscreen Lightbox**: Ketuk foto mana pun untuk melihat tampilan penuh yang jernih.
+
+### 5. 🎵 Musik Latar Romantis Retro (Synthesizer Web Audio API)
+- Musik latar romantis nostalgia yang disintesis langsung menggunakan Web Audio API (suara celesta/music box manis, melodi suling retro dengan vibrato romantis, dan petikan nada akustik hangat).
+- Berjalan 100% offline tanpa perlu mengunduh file MP3 besar.
+- Dilengkapi tombol toggle cepat `[🎵 Musik: ON/OFF]` di HUD atas.
+- Efek Suara Retro (SFX): Langkah kaki, tiupan angin lilin, kembang api boom, dan denting melodi penemuan kenangan.
+
+### 6. 🎂 Alur Pembuka Sinematik 5 Tahap (10–15 Detik)
+1. **01 Romantic Loading**: Layar gelap bertabur bintang dengan detak hati berdenyut bercahaya (*pulsing heart*).
+2. **02 Fireworks Celebration**: Pesta kembang api retro warna-warni menyinari malam.
+3. **03 Birthday Reveal**: Tulisan emas berkilau: *"Selamat Ulang Tahun ke-24, Sayang ❤️ - 26 NOVEMBER 2026"*.
+4. **04 Kue & 24 Lilin Interaktif**:
+   - Pilihan: **[Tiup Lilin 🎂]** atau **[Jelajahi Dunia Kita ✨]**.
+   - Hembusan angin sejuk meniup padam ke-24 lilin satu per satu dengan efek kepulan asap dan suara desis.
+   - Ledakan confetti penuh warna dan kartu pesan cinta yang tulus.
+5. **05 Transition to World**: Portal bintang pusaran spiral kosmik mengantarkan ke dunia permainan.
+*(Tersedia tombol "Lewati Intro ⏩" di pojok kanan atas kapan saja).*
+
+### 7. 🌌 Area Rahasia: "Our Little Universe"
+- Terletak di pulau kosmik terapung di bagian paling bawah peta.
+- Terkunci dengan gembok misterius hingga kelima lokasi kenangan selesai ditemukan.
+- Setelah terbuka, menampilkan surat cinta yang panjang dan menyentuh hati serta pesta kembang api spektakuler tanpa henti!
 
 ---
 
 ## 🚀 Cara Menjalankan
 
 ### Cara Paling Mudah (Windows):
-Cukup **klik dua kali file `start.bat`**. 
-Script ini akan otomatis menyalakan server lokal dan langsung membuka browser Anda di `http://localhost:8080`.
+Cukup **klik dua kali file `start.bat`**.
+Script ini otomatis memprioritaskan server modern berbasis Node.js (`server.js`) dan langsung membuka browser Anda di `http://localhost:8080`.
 
-### Atau Melalui Terminal / Command Prompt:
+### Melalui Terminal / Command Prompt:
 ```bash
-python -m http.server 8080
+node server.js
 ```
-Lalu buka browser di: **http://localhost:8080**
+atau
+```bash
+npm start
+```
+Buka browser di: **http://localhost:8080**
 
-*(Catatan: Karena aplikasi menggunakan JavaScript ES Modules modern, aplikasi perlu dijalankan melalui server lokal seperti di atas agar browser dapat memuat modul dan foto dengan sempurna).*
-
----
-
-## 🌟 Fitur & Alur Sesuai Spesifikasi Desain
-
-### 1. Opening Cinematic (10–15 Detik)
-1. **01 Romantic Loading**: Layar gelap bertabur bintang dengan animasi hati berdenyut bercahaya (*pulsing heart glow*) dan kalimat pembuka yang manis.
-2. **02 Fireworks Celebration**: Pesta kembang api canvas 2D bermunculan dari berbagai arah dengan partikel bintang dan hati.
-3. **03 Birthday Reveal**: Kemunculan teks berkilau:
-   - *"Selamat Ulang Tahun ke-24, Sayang ❤️"*
-   - *"Hari ini dunia merayakan seseorang yang sangat berarti bagiku."*
-   - *"26 NOVEMBER 2026"*
-4. **04 Cake & Lilin Interaktif**:
-   - Kue ulang tahun dengan angka emas **"24"** dan 24 lilin beranimasi api berkedip.
-   - Pilihan: **[Tiup Lilin 🎂]** atau **[Jelajahi Dunia Kita ✨]**.
-   - **Interaksi Tiup Lilin**:
-     - Zoom-in ke arah kue.
-     - Animasi hembusan angin sejuk melintasi layar.
-     - 24 lilin padam berurutan dengan suara dan efek kepulan asap kecil.
-     - Ledakan confetti penuh warna dan pendaran cahaya hangat.
-     - Muncul kartu ucapan romantis berisi doa & harapan tulus.
-5. **05 Transition to World**: Portal galeri kosmik spiral terbuka lembut mengantarkan ke dunia permainan.
-6. **Tombol "Lewati Intro"**: Tersedia di pojok kanan atas untuk langsung menuju dunia permainan kapan saja.
+### Untuk Membuka di HP Android:
+Pastikan HP Android dan laptop/komputer terhubung ke jaringan Wi-Fi yang sama, lalu buka alamat IP komputer Anda di browser Android (misal: `http://192.168.1.xxx:8080`).
 
 ---
 
-### 2. Dunia Kenangan Kita (Game World 2D)
-- **Visual Peta**: Lanskap alam 2D memukau dengan Danau Toba, Pulau Samosir lengkap dengan perahu dan dermaga, perbukitan Sinabung, pantai berpasir dengan ombak bergerak, lembah desa Meat, dan tebing megah Tongging.
-- **Karakter Pemain**: Karakter perempuan pixel art imut yang dapat digerakkan ke 4 arah dengan animasi langkah kaki halus.
-- **Multiplatform Controls**:
-  - **Mobile Touch**: Virtual Joystick analog responsif di kiri bawah + Tombol Aksi **[A]** di kanan bawah.
-  - **Tap-to-Walk**: Bisa langsung mengetuk/klik di area peta mana pun dan karakter akan berjalan ke sana.
-  - **Desktop Keyboard**: Tombol Panah atau W-A-S-D untuk bergerak, tombol `Space` / `E` / `Enter` untuk aksi.
-
----
-
-### 3. Eksplorasi 5 Lokasi Kenangan & Foto Nyata
-Ketika karakter mendekati setiap titik lokasi (1 s/d 5), tombol interaksi akan menyala:
-1. ⛵ **Samosir**: 10 Foto kenangan danau, dermaga, dan perahu.
-2. 🏔️ **Sinabung**: 10 Foto pemandangan bukit dan senja pegunungan.
-3. 🏖️ **Pantai**: 16 Foto pesona pantai, deburan ombak, dan matahari terbenam.
-4. 🌾 **Meat**: 7 Foto keasrian pedesaan, pepohonan, dan senyum manis.
-5. 🏞️ **Tongging**: 15 Foto panorama tebing tinggi menghadap danau.
-
-**Fitur Album Foto:**
-- Tampilan polaroid vintage dengan teks tanggal dan kutipan puitis.
-- Carousel foto dengan tombol navigasi, strip thumbnail, dan gestur geser (*swipe* pada HP).
-- Fitur *Lightbox Zoom* (klik foto untuk melihat ukuran besar resolusi penuh).
-
----
-
-### 4. 📖 Jurnal Kenangan (Memory Journal)
-- Menampilkan progres lokasi yang telah dikunjungi (misal: "3 dari 5 Kenangan").
-- Membuka album foto lokasi yang sudah ditemukan kapan saja tanpa harus berjalan ke titik tersebut.
-
----
-
-### 5. 🌌 Area Rahasia: "Our Little Universe"
-- Awalnya terkunci dengan gembok misterius di puncak pulau melayang.
-- **Terbuka otomatis setelah kelima lokasi kenangan selesai ditemukan!**
-- Berisi:
-  - Surat cinta istimewa yang panjang dan menyentuh hati.
-  - Pesta kembang api spektakuler tanpa henti di langit malam berbintang.
-
----
-
-### 6. Audio & Persistensi
-- **Musik BGM Romantis**: Dihasilkan secara langsung menggunakan Web Audio API (piano & celesta lembut, tanpa perlu unduhan file audio besar, langsung jalan offline).
-- **Efek Suara (SFX)**: Tiupan angin, lilin padam, petikan melodi memori, letusan kembang api, dan klik UI.
-- **Progress Save**: Progres eksplorasi otomatis tersimpan di `localStorage` peramban.
+Dibuat dengan segenap cinta untuk merayakan hari paling istimewa sang kekasih. ❤️✨

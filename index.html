@@ -3,40 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1016">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Selamat Ulang Tahun ke-24, Sayang ❤️ | Dunia Kenangan Kita</title>
+  <title>Selamat Ulang Tahun ke-24, Sayang ❤️ | Dunia Kenangan Kita (Retro Edition)</title>
+  
+  <!-- Retro Pixel Font (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Dancing+Script:wght@600;700&family=Nunito:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💖</text></svg>">
 </head>
 <body>
 
-  <!-- SVG Linear Gradients Definition -->
-  <svg width="0" height="0" style="position: absolute;">
-    <defs>
-      <linearGradient id="heartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#ff758c" />
-        <stop offset="100%" stop-color="#ff2a54" />
-      </linearGradient>
-    </defs>
-  </svg>
-
   <!-- ========================================================
        1. OPENING CINEMATIC LAYER (10-15 Detik Alur Romantis)
+       Berdasarkan Dokumen UX: a_detailed_infographic_ux_design_document_layout_o.png
   ======================================================== -->
-  <div id="cinematic-layer">
-    <!-- Tombol Skip Intro -->
-    <button id="btn-skip-intro" class="btn-skip">Lewati Intro ⏩</button>
+  <div id="cinematic-layer" class="cinematic-container active">
+    <!-- Tombol Lewati Intro -->
+    <button id="btn-skip-intro" class="retro-btn-skip">Lewati Intro ⏩</button>
 
-    <!-- Canvas Partikel Kembang Api & Confetti -->
+    <!-- Canvas Partikel Kembang Api & Confetti Intro -->
     <canvas id="cinematic-canvas"></canvas>
 
     <!-- 01. Romantic Loading -->
     <div id="screen-loading" class="cinematic-screen active">
       <div class="heart-pulse-box">
-        <svg class="heart-svg" viewBox="0 0 24 24">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-        </svg>
+        <div class="pixel-heart-pulse">💖</div>
       </div>
       <p class="loading-text">Menyiapkan sesuatu yang spesial untuk seseorang yang paling istimewa...</p>
     </div>
@@ -44,19 +40,19 @@
     <!-- 02. Fireworks Celebration -->
     <div id="screen-fireworks" class="cinematic-screen">
       <h2 class="fireworks-headline">✨ CELEBRATION ✨</h2>
-      <p style="color: #fda4af; font-size: 14px;">Langit malam mulai bersinar untukmu...</p>
+      <p class="fireworks-sub">Langit malam mulai bersinar untukmu...</p>
     </div>
 
     <!-- 03. Birthday Reveal -->
     <div id="screen-reveal" class="cinematic-screen">
-      <div class="reveal-box">
+      <div class="reveal-box retro-frame">
         <h1 class="reveal-title">Selamat Ulang Tahun<br>ke-24, Sayang ❤️</h1>
         <p class="reveal-subtitle">Hari ini dunia merayakan seseorang yang sangat berarti bagiku.</p>
         <div class="reveal-date">26 NOVEMBER 2026</div>
       </div>
     </div>
 
-    <!-- 04. Cake & Interactive Choices -->
+    <!-- 04. Cake & Interactive Choices (24 Lilin & Interaksi Tiup Lilin) -->
     <div id="screen-cake" class="cinematic-screen">
       <div id="cake-container" class="cake-container">
         <div id="cake-stage" class="cake-stage">
@@ -66,33 +62,36 @@
           <!-- 24 Lilin Interaktif -->
           <div id="candles-row" class="candles-row"></div>
 
-          <!-- Kue Ulang Tahun -->
-          <div class="cake-tier">
-            <div class="cake-frosting"></div>
+          <!-- Kue Ulang Tahun Pixel Retro -->
+          <div class="pixel-cake-body">
+            <div class="cake-icing-layer"></div>
+            <div class="cake-sponge-layer"></div>
+            <div class="cake-base-layer"></div>
           </div>
           <div class="cake-plate"></div>
 
           <!-- Animasi Tiupan Angin -->
           <div id="wind-effect" class="wind-effect">
-            <svg viewBox="0 0 400 60" style="width: 100%; height: 100%;">
-              <path d="M 0 30 Q 100 10 200 30 T 400 30" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="4" stroke-dasharray="10 10"/>
-              <path d="M 20 45 Q 120 25 220 45 T 380 45" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="3" stroke-dasharray="8 8"/>
-            </svg>
+            <div class="wind-line line-1"></div>
+            <div class="wind-line line-2"></div>
+            <div class="wind-line line-3"></div>
           </div>
         </div>
 
-        <!-- Tombol Pilihan -->
+        <!-- Tombol Pilihan Interaktif -->
         <div class="cake-choices">
-          <button id="btn-blow-candles" class="btn-primary">Tiup Lilin 🎂</button>
-          <button id="btn-explore-direct" class="btn-secondary">Jelajahi Dunia Kita ✨</button>
+          <button id="btn-blow-candles" class="retro-btn primary">Tiup Lilin 🎂</button>
+          <button id="btn-explore-direct" class="retro-btn secondary">Jelajahi Dunia Kita ✨</button>
         </div>
 
-        <!-- Pesan Hati (Setelah Lilin Ditiup) -->
-        <div id="heart-message-box" class="heart-message-box">
+        <!-- Pesan Hati (Muncul setelah lilin ditiup) -->
+        <div id="heart-message-box" class="heart-message-box retro-frame">
           <p class="heart-message-text">
             "Semoga semua harapan yang kamu bisikkan hari ini satu per satu menjadi nyata. Aku berharap bisa terus menemanimu merayakan banyak ulang tahun berikutnya. ❤️"
           </p>
-          <button id="btn-explore-after-blow" class="btn-primary" style="margin: 0 auto;">Jelajahi Dunia Kita ✨</button>
+          <button id="btn-explore-after-blow" class="retro-btn primary" style="margin-top: 15px;">
+            Jelajahi Dunia Kita ✨
+          </button>
         </div>
       </div>
     </div>
@@ -100,129 +99,146 @@
     <!-- 05. Transition to World (Portal Bintang) -->
     <div id="screen-transition" class="cinematic-screen">
       <div id="portal-vortex" class="portal-vortex"></div>
-      <p style="margin-top: 30px; font-family: 'Cinzel', serif; letter-spacing: 2px; color: #ffd700;">
+      <p class="transition-text">
         MEMBUKA DUNIA KENANGAN KITA...
       </p>
     </div>
   </div>
 
   <!-- ========================================================
-       2. GAME WORLD (DUNIA KENANGAN KITA)
+       2. RETRO GAME WORLD CANVAS (Forgotten Warrior Style)
   ======================================================== -->
   <div id="game-container">
     <canvas id="game-canvas"></canvas>
 
-    <!-- HUD OVERLAY -->
-    <div class="hud-layer">
-      <!-- HUD Top Bar -->
-      <div class="hud-top">
-        <button id="btn-sound-toggle" class="hud-btn" title="Toggle Musik / Suara">
-          <span id="sound-icon">🎵</span> Musik
-        </button>
-
-        <div style="display: flex; gap: 8px;">
-          <button id="btn-replay-intro" class="hud-btn" title="Putar Ulang Intro">
-            🎂 Intro
-          </button>
-          <button id="btn-journal-open" class="hud-btn" title="Buka Jurnal Kenangan">
-            📖 Jurnal <span id="journal-badge" class="badge-counter">0/5</span>
-          </button>
+    <!-- Top Floating Retro HUD -->
+    <div id="game-hud" class="game-hud">
+      <!-- Profil Karakter (Avatar Pixel Kekasih Sesuai Foto) -->
+      <div class="hud-profile retro-frame-sm">
+        <canvas id="hud-avatar-canvas" width="64" height="64"></canvas>
+        <div class="profile-info">
+          <div class="profile-name">Udy ❤️</div>
+          <div class="profile-badge">Princess Lv.24</div>
         </div>
       </div>
 
-      <!-- Floating Interaction Prompt saat Dekat Lokasi -->
-      <div id="interaction-prompt" class="interaction-prompt">
-        <button id="prompt-action-btn" class="prompt-btn">
-          <span id="prompt-text">Tampilkan Memori ✨</span>
-        </button>
+      <!-- Tracker 5 Permata Hati Kenangan -->
+      <div class="hud-memories retro-frame-sm">
+        <div class="memories-label">Kenangan:</div>
+        <div class="memories-hearts">
+          <span class="heart-gem">🖤</span>
+          <span class="heart-gem">🖤</span>
+          <span class="heart-gem">🖤</span>
+          <span class="heart-gem">🖤</span>
+          <span class="heart-gem">🖤</span>
+        </div>
       </div>
 
-      <!-- HUD Bottom Controls (Mobile Virtual Joystick & Button A) -->
-      <div class="hud-bottom">
-        <!-- Virtual Joystick -->
-        <div id="joystick-zone" class="joystick-zone">
-          <div id="joystick-thumb" class="joystick-thumb"></div>
-        </div>
+      <!-- Tombol Aksi Cepat HUD -->
+      <div class="hud-buttons">
+        <button id="btn-music-toggle" class="retro-btn-hud">🎵 Musik: ON</button>
+        <button id="btn-open-journal" class="retro-btn-hud">📖 Jurnal</button>
+      </div>
+    </div>
 
-        <!-- Tombol Aksi A -->
-        <div class="action-btn-zone">
-          <button id="btn-action-a" class="btn-action-a">A</button>
-          <span class="action-label">Interaksi</span>
+    <!-- Floating Interaction Prompt (Muncul saat mendekati lokasi kenangan) -->
+    <div id="interaction-prompt" class="interaction-prompt retro-frame">
+      <span id="prompt-text">✨ Buka Kenangan! [A]</span>
+    </div>
+
+    <!-- ========================================================
+         3. KONTROL TOUCH ANDROID (Virtual D-Pad & Tombol Aksi [A])
+    ======================================================== -->
+    <div id="mobile-controls" class="mobile-controls">
+      <!-- Virtual Analog D-Pad (Kiri Bawah) -->
+      <div id="virtual-dpad" class="virtual-dpad">
+        <div class="dpad-base">
+          <div class="dpad-arrow up">▲</div>
+          <div class="dpad-arrow down">▼</div>
+          <div class="dpad-arrow left">◀</div>
+          <div class="dpad-arrow right">▶</div>
         </div>
+        <div id="dpad-stick" class="dpad-stick"></div>
+      </div>
+
+      <!-- Tombol Aksi [A] Retro (Kanan Bawah) -->
+      <div class="action-btn-wrapper">
+        <button id="btn-action-a" class="btn-action-a" aria-label="Aksi">
+          <span class="btn-a-inner">A</span>
+        </button>
+        <span class="action-btn-label">AKSI</span>
       </div>
     </div>
   </div>
 
   <!-- ========================================================
-       3. MODAL: ALBUM KENANGAN (FOTO & CERITA)
+       4. MODAL: ALBUM KENANGAN (Model Scroll & Ringan untuk Android)
   ======================================================== -->
-  <div id="album-modal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div>
-          <h2 id="album-title" class="modal-title">Samosir</h2>
-          <div id="album-subtitle" style="font-size: 12px; color: var(--secondary-pink);">Danau & Dermaga</div>
-        </div>
-        <button id="btn-close-album" class="btn-close">✕</button>
+  <div id="album-modal" class="retro-modal-overlay">
+    <div class="retro-modal-window album-window">
+      <div class="modal-header-retro">
+        <h2 id="album-title" class="retro-modal-title">⛵ Samosir</h2>
+        <button id="btn-close-album" class="btn-retro-close">✕</button>
       </div>
 
-      <div class="modal-body">
-        <div id="album-date" style="font-size: 13px; color: var(--gold-accent); font-weight: 600;"></div>
+      <div class="modal-body-retro">
+        <div id="album-date" class="album-date-badge">📅 09 Juli 2026</div>
         
         <div class="album-quote-box">
-          <span id="album-quote">"Di antara tenangnya riak air..."</span>
+          <p id="album-quote">"Di antara tenangnya riak air..."</p>
         </div>
 
-        <!-- Polaroid Style Photo Viewer -->
-        <div class="polaroid-card">
-          <div class="polaroid-image-wrapper">
-            <img id="album-main-photo" class="polaroid-img" src="" alt="Kenangan Indah" loading="lazy">
-            <span id="album-counter" class="polaroid-counter">1 / 10</span>
+        <!-- MODEL SCROLL REEL (Horizontal Carousel dengan Snap & Lazy Load) -->
+        <div class="reel-scroll-wrapper">
+          <div id="album-scroll-reel" class="album-scroll-reel">
+            <!-- Kartu momen foto di-render otomatis secara optimal -->
           </div>
-          <div id="album-caption" class="polaroid-caption">Senyum manis favoritku di tepi danau.</div>
         </div>
 
-        <!-- Navigation Buttons -->
-        <div class="carousel-nav">
-          <button id="btn-prev-photo" class="btn-nav">◀ Sebelumnya</button>
-          <button id="btn-next-photo" class="btn-nav">Berikutnya ▶</button>
+        <!-- Tombol Navigasi Scroll & Counter -->
+        <div class="reel-nav-bar">
+          <button id="btn-prev-photo" class="retro-nav-btn">◀ Prev</button>
+          <div id="album-counter" class="reel-counter-badge">1 / 10</div>
+          <button id="btn-next-photo" class="retro-nav-btn">Next ▶</button>
         </div>
 
-        <!-- Thumbnail Strip -->
-        <div id="album-thumbnails" class="thumbnails-strip"></div>
+        <!-- Thumbnail Filmstrip di Bawah -->
+        <div class="thumbnails-container">
+          <div id="album-thumbnails" class="reel-thumb-strip"></div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- ========================================================
-       4. MODAL: MEMORY JOURNAL (CATATAN KENANGAN & PROGRES)
+       5. MODAL: JURNAL KENANGAN KITA (MEMORY JOURNAL)
   ======================================================== -->
-  <div id="journal-modal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 class="modal-title">📖 Jurnal Kenangan Kita</h2>
-        <button id="btn-close-journal" class="btn-close">✕</button>
+  <div id="journal-modal" class="retro-modal-overlay">
+    <div class="retro-modal-window journal-window">
+      <div class="modal-header-retro">
+        <h2 class="retro-modal-title">📖 Jurnal Kenangan Kita</h2>
+        <button id="btn-close-journal" class="btn-retro-close">✕</button>
       </div>
 
-      <div class="modal-body">
-        <!-- Progress Bar -->
-        <div class="journal-progress-container">
-          <div class="journal-progress-info">
-            <span style="font-weight: 600;">Progres Eksplorasi:</span>
-            <span id="journal-progress-text" style="color: var(--gold-accent); font-weight: 700;">0 dari 5 Kenangan</span>
+      <div class="modal-body-retro">
+        <!-- Progress Tracker -->
+        <div class="journal-progress-box">
+          <div class="progress-info-row">
+            <span>Progres Eksplorasi:</span>
+            <span id="journal-progress-text" class="gold-text">0 dari 5 Kenangan</span>
           </div>
-          <div class="journal-progress-track">
-            <div id="journal-progress-bar" class="journal-progress-fill"></div>
+          <div class="progress-track-retro">
+            <div id="journal-progress-bar" class="progress-bar-fill"></div>
           </div>
-          <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">
-            Temukan kelima lokasi untuk membuka area rahasia <strong>"Our Little Universe"</strong> 🌌
+          <p class="journal-hint-text">
+            Temukan kelima lokasi di peta untuk membuka area rahasia <strong>"Our Little Universe"</strong> 🌌
           </p>
         </div>
 
-        <!-- List of Locations -->
-        <div id="journal-list" class="journal-list"></div>
+        <!-- Daftar Lokasi Kenangan -->
+        <div id="journal-list" class="journal-list-grid"></div>
 
-        <button id="btn-reset-progress" style="margin-top: 14px; background: transparent; border: 1px dashed rgba(255,255,255,0.2); color: #94a3b8; font-size: 11px; padding: 8px; border-radius: 8px; cursor: pointer;">
+        <button id="btn-reset-progress" class="btn-reset-retro">
           ↺ Reset Progres Petualangan
         </button>
       </div>
@@ -230,33 +246,33 @@
   </div>
 
   <!-- ========================================================
-       5. MODAL: OUR LITTLE UNIVERSE (AREA RAHASIA & SURAT CINTA)
+       6. MODAL: OUR LITTLE UNIVERSE (AREA RAHASIA & SURAT CINTA)
   ======================================================== -->
-  <div id="secret-modal" class="modal-overlay">
+  <div id="secret-modal" class="retro-modal-overlay">
     <canvas id="secret-fireworks-canvas"></canvas>
 
-    <div class="modal-content" style="z-index: 10; max-width: 520px;">
-      <div class="modal-header">
-        <h2 class="modal-title">🌌 Our Little Universe</h2>
-        <button id="btn-close-secret" class="btn-close">✕</button>
+    <div class="retro-modal-window secret-window">
+      <div class="modal-header-retro">
+        <h2 class="retro-modal-title">🌌 Our Little Universe</h2>
+        <button id="btn-close-secret" class="btn-retro-close">✕</button>
       </div>
 
-      <div class="modal-body">
-        <!-- Tampilan Saat Masih Terkunci -->
-        <div id="secret-locked-notice" class="hidden" style="text-align: center; padding: 30px 10px;">
-          <div style="font-size: 48px; margin-bottom: 12px;">🔒</div>
-          <h3 style="color: #cbd5e1; margin-bottom: 8px;">Area Rahasia Terkunci</h3>
-          <p style="font-size: 14px; color: #94a3b8; line-height: 1.6;">
-            Kamu harus menemukan seluruh kelima lokasi kenangan kita terlebih dahulu di peta sebelum portal bintang ini dapat terbuka! 💖
+      <div class="modal-body-retro">
+        <!-- Jika Masih Terkunci -->
+        <div id="secret-locked-notice" class="secret-locked-box hidden">
+          <div class="lock-big-icon">🔒</div>
+          <h3 class="lock-title">Area Rahasia Terkunci</h3>
+          <p class="lock-desc">
+            Kamu harus menemukan seluruh kelima lokasi kenangan kita di peta terlebih dahulu sebelum portal kosmik ini terbuka! 💖
           </p>
         </div>
 
-        <!-- Tampilan Saat Terbuka -->
-        <div id="secret-unlocked-content" class="secret-container">
-          <div class="secret-letter-card">
-            <h3 id="secret-title" style="font-family: 'Cinzel', serif; color: var(--gold-accent); text-align: center; font-size: 20px;"></h3>
+        <!-- Jika Terbuka -->
+        <div id="secret-unlocked-content" class="secret-unlocked-box">
+          <div class="secret-letter-parchment">
+            <h3 id="secret-title" class="secret-letter-title"></h3>
             <div id="secret-body" class="secret-letter-body"></div>
-            <div id="secret-date" style="text-align: right; margin-top: 16px; font-family: 'Dancing Script', cursive; font-size: 20px; color: var(--secondary-pink);"></div>
+            <div id="secret-date" class="secret-letter-signature"></div>
           </div>
         </div>
       </div>
@@ -264,17 +280,17 @@
   </div>
 
   <!-- ========================================================
-       6. MODAL: LIGHTBOX ZOOM FOTO
+       7. MODAL: FULLSCREEN LIGHTBOX
   ======================================================== -->
-  <div id="lightbox-modal" class="modal-overlay">
-    <button id="btn-close-lightbox" class="btn-close" style="position: absolute; top: 20px; right: 20px; z-index: 2100;">✕</button>
-    <div class="lightbox-content">
-      <img id="lightbox-img" src="" alt="Detail Foto">
-      <div id="lightbox-caption" class="lightbox-caption"></div>
+  <div id="lightbox-modal" class="lightbox-overlay">
+    <button id="btn-close-lightbox" class="lightbox-close-btn">✕</button>
+    <div class="lightbox-inner">
+      <img id="lightbox-img" src="" alt="Detail Kenangan">
+      <div id="lightbox-caption" class="lightbox-caption-text"></div>
     </div>
   </div>
 
-  <!-- Scripts -->
+  <!-- Main JavaScript Application Module -->
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

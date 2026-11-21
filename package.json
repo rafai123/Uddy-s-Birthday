@@ -1,0 +1,13 @@
+{
+  "name": "ultah-udy-retro",
+  "version": "2.0.0",
+  "description": "Dunia Kenangan Kita - Ulang Tahun ke-24 Udy (Retro Forgotten Warrior Style)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["retro-game", "birthday", "pixel-art", "javascript"],
+  "author": "rafai",
+  "license": "MIT"
+}

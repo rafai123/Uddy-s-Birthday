@@ -1,234 +1,178 @@
-// Input Controller: Virtual Joystick, Action Button 'A', Keyboard WASD/Arrows, and Tap-to-Walk
-export class ControlsController {
-  constructor({ gameWorld, onAction }) {
-    this.gameWorld = gameWorld;
+// Kontrol Input Retro: Virtual Joystick / D-Pad, Tombol Aksi [A] & Keyboard
+// Dioptimalkan khusus untuk Android (Touch First, No Page Drag, Haptic Feedback)
+
+import { retroAudio } from "./audio.js";
+
+export class ControlsManager {
+  constructor({ onMove, onAction }) {
+    this.onMove = onMove;
     this.onAction = onAction;
 
-    this.joystickZone = document.getElementById("joystick-zone");
-    this.joystickThumb = document.getElementById("joystick-thumb");
-    this.btnActionA = document.getElementById("btn-action-a");
+    // Elemen D-Pad / Joystick
+    this.dpadContainer = document.getElementById("virtual-dpad");
+    this.dpadStick = document.getElementById("dpad-stick");
+    this.btnAction = document.getElementById("btn-action-a");
 
-    this.joystickActive = false;
-    this.touchId = null;
-    this.originX = 0;
-    this.originY = 0;
-    this.maxRadius = 45;
+    this.isDraggingDpad = false;
+    this.dpadCenter = { x: 0, y: 0 };
+    this.maxDpadRadius = 45; // Jangkauan maksimal thumb stick
 
-    this.keys = {
-      up: false,
-      down: false,
-      left: false,
-      right: false
-    };
+    this.activeKeys = new Set();
+    this.moveVector = { x: 0, y: 0 };
 
-    this.targetWalkPoint = null;
-    this.walkInterval = null;
-
-    this.init();
+    this.initTouchControls();
+    this.initKeyboardControls();
   }
 
-  init() {
-    this.bindJoystick();
-    this.bindKeyboard();
-    this.bindTapToWalk();
-    this.bindActionButton();
-  }
+  initTouchControls() {
+    if (!this.dpadContainer || !this.btnAction) return;
 
-  bindJoystick() {
-    if (!this.joystickZone) return;
-
-    const handleStart = (clientX, clientY, identifier) => {
-      this.joystickActive = true;
-      this.touchId = identifier;
-      const rect = this.joystickZone.getBoundingClientRect();
-      this.originX = rect.left + rect.width / 2;
-      this.originY = rect.top + rect.height / 2;
-      this.handleMove(clientX, clientY);
-      this.stopTapWalk();
-    };
-
-    const handleMove = (clientX, clientY) => {
-      if (!this.joystickActive) return;
-      const dx = clientX - this.originX;
-      const dy = clientY - this.originY;
-      const dist = Math.hypot(dx, dy);
-      const angle = Math.atan2(dy, dx);
-
-      const clampedDist = Math.min(this.maxRadius, dist);
-      const thumbX = Math.cos(angle) * clampedDist;
-      const thumbY = Math.sin(angle) * clampedDist;
-
-      this.joystickThumb.style.transform = `translate(${thumbX}px, ${thumbY}px)`;
-
-      // Normalize speed
-      const intensity = clampedDist / this.maxRadius;
-      const vx = Math.cos(angle) * (this.gameWorld.player.speed * intensity);
-      const vy = Math.sin(angle) * (this.gameWorld.player.speed * intensity);
-      this.gameWorld.setMovement(vx, vy);
-    };
-
-    const handleEnd = () => {
-      this.joystickActive = false;
-      this.touchId = null;
-      this.joystickThumb.style.transform = `translate(0px, 0px)`;
-      if (!this.hasActiveKeyboard()) {
-        this.gameWorld.setMovement(0, 0);
-      }
-    };
-
-    this.handleMove = handleMove;
-
-    // Touch Events
-    this.joystickZone.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      const touch = e.changedTouches[0];
-      handleStart(touch.clientX, touch.clientY, touch.identifier);
-    }, { passive: false });
-
-    window.addEventListener("touchmove", (e) => {
-      if (!this.joystickActive) return;
-      for (let i = 0; i < e.changedTouches.length; i++) {
-        const touch = e.changedTouches[i];
-        if (touch.identifier === this.touchId) {
-          handleMove(touch.clientX, touch.clientY);
-          break;
-        }
-      }
-    });
-
-    window.addEventListener("touchend", (e) => {
-      if (!this.joystickActive) return;
-      for (let i = 0; i < e.changedTouches.length; i++) {
-        const touch = e.changedTouches[i];
-        if (touch.identifier === this.touchId) {
-          handleEnd();
-          break;
-        }
-      }
-    });
-
-    // Mouse Fallback for testing joystick on desktop
-    this.joystickZone.addEventListener("mousedown", (e) => {
-      handleStart(e.clientX, e.clientY, "mouse");
-      const onMouseMove = (ev) => handleMove(ev.clientX, ev.clientY);
-      const onMouseUp = () => {
-        handleEnd();
-        window.removeEventListener("mousemove", onMouseMove);
-        window.removeEventListener("mouseup", onMouseUp);
+    // 1. Virtual Joystick / D-Pad Touch Handlers
+    const startDrag = (clientX, clientY) => {
+      this.isDraggingDpad = true;
+      const rect = this.dpadContainer.getBoundingClientRect();
+      this.dpadCenter = {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
       };
-      window.addEventListener("mousemove", onMouseMove);
-      window.addEventListener("mouseup", onMouseUp);
+      this.updateDpadPosition(clientX, clientY);
+    };
+
+    const moveDrag = (clientX, clientY) => {
+      if (!this.isDraggingDpad) return;
+      this.updateDpadPosition(clientX, clientY);
+    };
+
+    const endDrag = () => {
+      if (!this.isDraggingDpad) return;
+      this.isDraggingDpad = false;
+      this.dpadStick.style.transform = `translate(0px, 0px)`;
+      this.moveVector = { x: 0, y: 0 };
+      if (this.onMove) this.onMove(0, 0);
+    };
+
+    // Pointer Events (Mendukung Touch HP Android & Mouse)
+    this.dpadContainer.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      startDrag(e.clientX, e.clientY);
+      this.dpadContainer.setPointerCapture(e.pointerId);
     });
+
+    this.dpadContainer.addEventListener("pointermove", (e) => {
+      if (this.isDraggingDpad) {
+        e.preventDefault();
+        moveDrag(e.clientX, e.clientY);
+      }
+    });
+
+    const pointerUp = (e) => {
+      if (this.isDraggingDpad) {
+        e.preventDefault();
+        endDrag();
+      }
+    };
+    this.dpadContainer.addEventListener("pointerup", pointerUp);
+    this.dpadContainer.addEventListener("pointercancel", pointerUp);
+
+    // 2. Tombol Aksi [A] Retro
+    const handleActionPress = (e) => {
+      e.preventDefault();
+      retroAudio.playButtonClick();
+
+      // Haptic vibration feedback untuk Android
+      if (navigator.vibrate) {
+        navigator.vibrate([30]);
+      }
+
+      this.btnAction.classList.add("pressed");
+      if (this.onAction) this.onAction();
+    };
+
+    const handleActionRelease = (e) => {
+      e.preventDefault();
+      this.btnAction.classList.remove("pressed");
+    };
+
+    this.btnAction.addEventListener("pointerdown", handleActionPress);
+    this.btnAction.addEventListener("pointerup", handleActionRelease);
+    this.btnAction.addEventListener("pointercancel", handleActionRelease);
   }
 
-  bindKeyboard() {
-    window.addEventListener("keydown", (e) => {
-      const code = e.code;
-      if (["KeyW", "ArrowUp"].includes(code)) this.keys.up = true;
-      if (["KeyS", "ArrowDown"].includes(code)) this.keys.down = true;
-      if (["KeyA", "ArrowLeft"].includes(code)) this.keys.left = true;
-      if (["KeyD", "ArrowRight"].includes(code)) this.keys.right = true;
+  updateDpadPosition(clientX, clientY) {
+    const dx = clientX - this.dpadCenter.x;
+    const dy = clientY - this.dpadCenter.y;
+    const dist = Math.hypot(dx, dy);
 
-      if (["Space", "KeyE", "Enter"].includes(code)) {
+    // Batasi gerakan stick visual
+    const angle = Math.atan2(dy, dx);
+    const clampedDist = Math.min(dist, this.maxDpadRadius);
+    const stickX = Math.cos(angle) * clampedDist;
+    const stickY = Math.sin(angle) * clampedDist;
+
+    this.dpadStick.style.transform = `translate(${stickX}px, ${stickY}px)`;
+
+    // Normalisasi vektor pergerakan
+    if (dist > 8) {
+      const vx = Math.cos(angle);
+      const vy = Math.sin(angle);
+      this.moveVector = { x: vx, y: vy };
+      if (this.onMove) this.onMove(vx, vy);
+    } else {
+      this.moveVector = { x: 0, y: 0 };
+      if (this.onMove) this.onMove(0, 0);
+    }
+  }
+
+  initKeyboardControls() {
+    window.addEventListener("keydown", (e) => {
+      // Abaikan jika modal sedang terbuka atau input text aktif
+      if (document.body.classList.contains("modal-open")) return;
+
+      const key = e.key.toLowerCase();
+      this.activeKeys.add(key);
+
+      if (key === " " || key === "e" || key === "enter") {
+        e.preventDefault();
+        retroAudio.playButtonClick();
         if (this.onAction) this.onAction();
+        return;
       }
 
       this.updateKeyboardMovement();
     });
 
     window.addEventListener("keyup", (e) => {
-      const code = e.code;
-      if (["KeyW", "ArrowUp"].includes(code)) this.keys.up = false;
-      if (["KeyS", "ArrowDown"].includes(code)) this.keys.down = false;
-      if (["KeyA", "ArrowLeft"].includes(code)) this.keys.left = false;
-      if (["KeyD", "ArrowRight"].includes(code)) this.keys.right = false;
-
+      const key = e.key.toLowerCase();
+      this.activeKeys.delete(key);
       this.updateKeyboardMovement();
     });
   }
 
-  hasActiveKeyboard() {
-    return this.keys.up || this.keys.down || this.keys.left || this.keys.right;
-  }
-
   updateKeyboardMovement() {
-    if (this.joystickActive) return;
-
     let vx = 0;
     let vy = 0;
-    const speed = this.gameWorld.player.speed;
 
-    if (this.keys.up) vy -= speed;
-    if (this.keys.down) vy += speed;
-    if (this.keys.left) vx -= speed;
-    if (this.keys.right) vx += speed;
+    if (this.activeKeys.has("arrowup") || this.activeKeys.has("w")) vy -= 1;
+    if (this.activeKeys.has("arrowdown") || this.activeKeys.has("s")) vy += 1;
+    if (this.activeKeys.has("arrowleft") || this.activeKeys.has("a")) vx -= 1;
+    if (this.activeKeys.has("arrowright") || this.activeKeys.has("d")) vx += 1;
 
+    // Normalisasi diagonal
     if (vx !== 0 && vy !== 0) {
       vx *= 0.7071;
       vy *= 0.7071;
     }
 
-    if (vx !== 0 || vy !== 0) {
-      this.stopTapWalk();
-      this.gameWorld.setMovement(vx, vy);
-    } else {
-      this.gameWorld.setMovement(0, 0);
-    }
+    if (this.onMove) this.onMove(vx, vy);
   }
 
-  bindTapToWalk() {
-    const canvas = this.gameWorld.canvas;
-    canvas.addEventListener("pointerdown", (e) => {
-      // Don't trigger if interacting with UI overlay
-      if (e.target !== canvas) return;
-
-      const worldPos = this.gameWorld.screenToWorld(e.clientX, e.clientY);
-      this.startTapWalk(worldPos.x, worldPos.y);
-    });
-  }
-
-  startTapWalk(targetX, targetY) {
-    this.targetWalkPoint = { x: targetX, y: targetY };
-    this.stopTapWalk();
-
-    this.walkInterval = setInterval(() => {
-      if (!this.targetWalkPoint) {
-        this.stopTapWalk();
-        return;
-      }
-      const dx = this.targetWalkPoint.x - this.gameWorld.player.x;
-      const dy = this.targetWalkPoint.y - this.gameWorld.player.y;
-      const dist = Math.hypot(dx, dy);
-
-      if (dist < 10) {
-        this.gameWorld.setMovement(0, 0);
-        this.stopTapWalk();
-      } else {
-        this.gameWorld.walkTo(this.targetWalkPoint.x, this.targetWalkPoint.y);
-      }
-    }, 1000 / 60);
-  }
-
-  stopTapWalk() {
-    if (this.walkInterval) {
-      clearInterval(this.walkInterval);
-      this.walkInterval = null;
-    }
-  }
-
-  bindActionButton() {
-    if (!this.btnActionA) return;
-    this.btnActionA.addEventListener("click", () => {
-      if (this.onAction) this.onAction();
-    });
-  }
-
-  setActionButtonHighlight(active) {
-    if (!this.btnActionA) return;
+  // Tampilkan efek menyala pada tombol aksi saat dekat lokasi
+  highlightActionButton(active, promptText = "") {
+    if (!this.btnAction) return;
     if (active) {
-      this.btnActionA.classList.add("pulse-glow");
+      this.btnAction.classList.add("highlight");
     } else {
-      this.btnActionA.classList.remove("pulse-glow");
+      this.btnAction.classList.remove("highlight");
     }
   }
 }
