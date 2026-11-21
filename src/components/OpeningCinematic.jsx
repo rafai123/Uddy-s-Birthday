@@ -205,9 +205,16 @@ export function OpeningCinematic({ onComplete }) {
 
       {/* 02. Fireworks Celebration */}
       {step === 2 && (
-        <div style={{ position: 'relative', zIndex: 10, textAlign: 'center' }}>
-          <h2 style={{ fontFamily: 'var(--font-retro)', fontSize: 20, color: '#fbbf24', marginBottom: 12, textShadow: '0 0 16px rgba(251,191,36,0.8)' }}>
-            ✨ CELEBRATION ✨
+        <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '0 16px' }}>
+          <h2 style={{
+            fontFamily: 'var(--font-retro)',
+            fontSize: 'clamp(12px, 4vw, 18px)',
+            color: '#fbbf24',
+            marginBottom: 12,
+            lineHeight: 1.5,
+            textShadow: '0 0 16px rgba(251,191,36,0.8)'
+          }}>
+            ✨ Selamat Ulang Tahun Sayang ✨
           </h2>
           <p style={{ fontFamily: 'var(--font-retro)', fontSize: 10, color: '#f472b6' }}>
             Langit malam mulai bersinar untukmu...
