@@ -1,13 +1,12 @@
 @echo off
-title Dunia Kenangan Kita - Final Fantasy Birthday Edition
+title Dunia Kenangan Kita - Final Fantasy Edition
 echo ========================================================
 echo   Selamat Ulang Tahun ke-24, Sayang! ❤️
-echo   Final Fantasy Retro Edition (React + Vite)
+echo   Final Fantasy Retro Edition (8-Bit / 16-Bit)
 echo ========================================================
 echo.
 
-REM Jalankan Vite dev server pada port 8080
 start "" http://localhost:8080
-npm run dev -- --host 0.0.0.0 --port 8080
+node server.js
 
 pause
