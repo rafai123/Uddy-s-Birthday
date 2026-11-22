@@ -66,10 +66,37 @@ const server = http.createServer((req, res) => {
 
     const ext = path.extname(safePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+    const isAudio = ext === '.mp3' || ext === '.wav' || ext === '.ogg';
+
+    // Mendukung HTTP 206 Partial Content (Streaming) untuk Audio di Mobile & Desktop
+    // Mencegah browser/Android menganggap audio sebagai file unduhan paksa (force download).
+    const range = req.headers.range;
+    if (isAudio && range) {
+      const parts = range.replace(/bytes=/, '').split('-');
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : stats.size - 1;
+      const chunksize = (end - start) + 1;
+
+      const headers = {
+        'Content-Range': `bytes ${start}-${end}/${stats.size}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunksize,
+        'Content-Type': contentType,
+        'Content-Disposition': 'inline',
+        'Cache-Control': 'public, max-age=86400',
+        'Access-Control-Allow-Origin': '*'
+      };
+
+      res.writeHead(206, headers);
+      fs.createReadStream(safePath, { start, end }).pipe(res);
+      return;
+    }
 
     const headers = {
       'Content-Type': contentType,
       'Content-Length': stats.size,
+      'Content-Disposition': 'inline',
+      'Accept-Ranges': 'bytes',
       'Access-Control-Allow-Origin': '*'
     };
 

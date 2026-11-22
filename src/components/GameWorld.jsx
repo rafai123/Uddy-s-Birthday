@@ -16,7 +16,7 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
     player: {
       x: 672,
       y: 780,
-      speed: 1.85, // Kecepatan berjalan santai & anggun
+      speed: 1.75, // Kecepatan berjalan santai & anggun
       vx: 0,
       vy: 0,
       facing: 'down',
@@ -368,14 +368,14 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
       let near = null;
       for (const loc of LOCATIONS_DATA) {
         const d = Math.hypot(loc.coords.x - s.player.x, loc.coords.y - s.player.y);
-        if (d < 80) {
+        if (d < 105) {
           near = loc;
           break;
         }
       }
       if (!near) {
         const dSecret = Math.hypot(SECRET_AREA.coords.x - s.player.x, SECRET_AREA.coords.y - s.player.y);
-        if (dSecret < 95) {
+        if (dSecret < 110) {
           near = SECRET_AREA;
         }
       }
@@ -466,44 +466,128 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
       }
       ctx.restore();
 
-      // E. 5 Monumen Kristal Kenangan
+      // E. 5 Monumen Cinta Kenangan (Desain Love Hati Besar & Berkilau)
       LOCATIONS_DATA.forEach((loc, idx) => {
         const isVisited = visitedList.includes(loc.id);
         const x = loc.coords.x;
         const y = loc.coords.y;
 
-        const pWave = Math.sin(s.tick * 0.08 + idx) * 5;
-        const grad = ctx.createRadialGradient(x, y, 4, x, y, 38 + pWave);
-        grad.addColorStop(0, loc.crystalColor + (isVisited ? 'aa' : '66'));
+        // 1. Aura Tanah Berbentuk Hati Romantis yang Berdenyut
+        const heartBeat = 1 + Math.sin(s.tick * 0.08 + idx) * 0.08;
+        const pWave = Math.sin(s.tick * 0.07 + idx) * 6;
+        const auraR = (52 + pWave) * heartBeat;
+
+        const grad = ctx.createRadialGradient(x, y, 6, x, y, auraR);
+        grad.addColorStop(0, loc.crystalColor + (isVisited ? 'bb' : '77'));
+        grad.addColorStop(0.65, loc.crystalColor + (isVisited ? '44' : '22'));
         grad.addColorStop(1, 'transparent');
         ctx.fillStyle = grad;
         ctx.beginPath();
-        ctx.arc(x, y, 38 + pWave, 0, Math.PI * 2);
+        ctx.arc(x, y, auraR, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.drawImage(ffSprites.propSprites.shrine, x - 20, y - 23);
+        // 2. Altar Pedestal Marmer & Emas Berukir Hati
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.beginPath();
+        ctx.ellipse(x, y + 6, 26, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
 
-        const floatY = y - 36 + Math.sin(s.tick * 0.08 + idx * 1.5) * 4;
+        // Base altar batu marmer
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(x - 22, y - 10, 44, 16);
+        ctx.fillStyle = '#334155';
+        ctx.fillRect(x - 20, y - 8, 40, 12);
+        ctx.fillStyle = '#f59e0b'; // Trim emas
+        ctx.fillRect(x - 22, y - 10, 44, 2);
+        ctx.fillRect(x - 20, y + 4, 40, 2);
+
+        // Ukiran hati emas kecil di depan altar
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('♥', x, y + 2);
+
+        // 3. Kristal Hati 3D Melayang Besar (Large 3D Faceted Crystal Heart)
+        const floatY = y - 44 + Math.sin(s.tick * 0.06 + idx * 1.5) * 5;
+        const hSize = 34 * heartBeat; // Sedikit lebih besar & berdenyut cinta
+
+        ctx.save();
+        ctx.translate(x, floatY);
+
+        // Halo pendaran kristal hati
+        ctx.shadowColor = loc.crystalColor;
+        ctx.shadowBlur = isVisited ? 18 : 12;
+
+        // Dimensi sayap hati
+        const hw = hSize * 0.52;
+        const hh = hSize * 0.95;
+        const topH = hh * 0.35;
+
+        // Sayap kiri hati (lebih terang)
         ctx.fillStyle = loc.crystalColor;
         ctx.beginPath();
-        ctx.moveTo(x, floatY - 12);
-        ctx.lineTo(x + 9, floatY);
-        ctx.lineTo(x, floatY + 12);
-        ctx.lineTo(x - 9, floatY);
+        ctx.moveTo(0, topH);
+        ctx.bezierCurveTo(0, 0, -hw, 0, -hw, topH);
+        ctx.bezierCurveTo(-hw, topH + (hh - topH) * 0.45, 0, hh * 0.85, 0, hh);
         ctx.closePath();
         ctx.fill();
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(x - 2, floatY - 5, 4, 4);
 
+        // Sayap kanan hati (sedikit lebih gelap untuk kedalaman 3D)
+        ctx.fillStyle = loc.crystalColor;
+        ctx.globalAlpha = 0.85;
+        ctx.beginPath();
+        ctx.moveTo(0, topH);
+        ctx.bezierCurveTo(0, 0, hw, 0, hw, topH);
+        ctx.bezierCurveTo(hw, topH + (hh - topH) * 0.45, 0, hh * 0.85, 0, hh);
+        ctx.closePath();
+        ctx.fill();
+
+        // Faset kilau kristal di bagian dalam (Gleam highlight)
+        ctx.globalAlpha = 0.65;
         ctx.fillStyle = '#ffffff';
-        ctx.font = "bold 12px 'Press Start 2P', monospace";
+        ctx.beginPath();
+        ctx.moveTo(-hw * 0.55, topH * 0.8);
+        ctx.bezierCurveTo(-hw * 0.7, topH * 0.9, -hw * 0.6, topH * 1.4, -hw * 0.25, topH * 1.8);
+        ctx.bezierCurveTo(-hw * 0.35, topH * 1.3, -hw * 0.35, topH * 0.9, -hw * 0.55, topH * 0.8);
+        ctx.closePath();
+        ctx.fill();
+
+        // Kilau bintang ✦ di puncak kiri hati
+        ctx.globalAlpha = 0.95;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('✦', -hw * 0.35, topH * 0.7);
+
+        ctx.restore();
+
+        // 4. Percikan Hati & Bintang Mini Melayang Naik (Love Sparkles)
+        for (let sp = 0; sp < 2; sp++) {
+          const spOffset = (s.tick * 0.6 + sp * 24 + idx * 16) % 48;
+          const spY = floatY - spOffset;
+          const spX = x + Math.sin(s.tick * 0.05 + sp * 2) * 16;
+          const spAlpha = Math.max(0, 1 - spOffset / 48);
+
+          ctx.save();
+          ctx.globalAlpha = spAlpha;
+          ctx.fillStyle = sp % 2 === 0 ? '#fda4af' : '#fef08a';
+          ctx.font = '9px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(sp % 2 === 0 ? '♥' : '✦', spX, spY);
+          ctx.restore();
+        }
+
+        // 5. Label Lokasi & Status Kenangan
+        ctx.fillStyle = '#ffffff';
+        ctx.font = "bold 11px 'Press Start 2P', monospace";
         ctx.textAlign = 'center';
         ctx.shadowColor = '#000';
-        ctx.shadowBlur = 4;
-        ctx.fillText(`${loc.icon} ${loc.id}`, x, y + 36);
-        ctx.font = "9px 'Press Start 2P', monospace";
-        ctx.fillStyle = isVisited ? '#fef08a' : '#cbd5e1';
-        ctx.fillText(loc.name, x, y + 50);
+        ctx.shadowBlur = 5;
+        ctx.fillText(`❤️ ${loc.name} #${loc.id}`, x, y + 26);
+
+        ctx.font = "8px 'Press Start 2P', monospace";
+        ctx.fillStyle = isVisited ? '#fef08a' : '#93c5fd';
+        ctx.fillText(isVisited ? '💖 MEMORI TERSIMPAN' : '✨ BUKA KENANGAN', x, y + 40);
         ctx.shadowBlur = 0;
       });
 

@@ -37,7 +37,8 @@ export function VirtualControls({ onMove, onAction, nearLocation }) {
     const dx = clientX - centerRef.current.x;
     const dy = clientY - centerRef.current.y;
     const dist = Math.hypot(dx, dy);
-    const maxRadius = 40;
+    const maxRadius = 38;
+    const deadzone = 8; // Zona nyaman agar tidak liar/terlalu sensitif
 
     const angle = Math.atan2(dy, dx);
     const clampedDist = Math.min(dist, maxRadius);
@@ -46,8 +47,11 @@ export function VirtualControls({ onMove, onAction, nearLocation }) {
 
     setStickPos({ x: sx, y: sy });
 
-    if (dist > 6) {
-      onMove({ x: Math.cos(angle), y: Math.sin(angle) });
+    if (dist > deadzone) {
+      // Kurva sensitivitas gradual (smooth analog power curve)
+      const rawPower = (clampedDist - deadzone) / (maxRadius - deadzone);
+      const power = Math.pow(Math.min(1, Math.max(0, rawPower)), 1.35);
+      onMove({ x: Math.cos(angle) * power, y: Math.sin(angle) * power });
     } else {
       onMove({ x: 0, y: 0 });
     }

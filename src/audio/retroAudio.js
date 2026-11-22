@@ -1,5 +1,6 @@
 // 🎹 River Flows in You – Yiruma | Real Piano Cover MP3 & Firework Audio Engine
 // Dioptimalkan khusus untuk web: MP3 piano jernih ringan + Web Audio API buffer untuk ledakan kembang api
+import { FIREWORK_B64 } from './fireworkSoundData';
 
 class RomanticPianoAudio {
   constructor() {
@@ -21,6 +22,9 @@ class RomanticPianoAudio {
         this.bgmAudio = new Audio('./audio/river_flows_in_you.mp3');
         this.bgmAudio.loop = true;
         this.bgmAudio.volume = 0.75;
+        this.bgmAudio.preload = 'auto';
+        this.bgmAudio.setAttribute('playsinline', 'true');
+        this.bgmAudio.setAttribute('webkit-playsinline', 'true');
       } catch (e) {
         console.warn('HTML5 Audio init:', e);
       }
@@ -60,15 +64,15 @@ class RomanticPianoAudio {
     }
   }
 
-  // Pre-load file ledakan kembang api ke RAM audio buffer untuk latensi 0ms & multitrack boom
+  // Decode suara kembang api dari memori base64 internal (bebas request jaringan & bebas download dialog!)
   loadFireworkBuffer() {
     if (!this.ctx || this.fireworkBuffer) return;
     try {
-      fetch('./audio/firework_explosion.mp3')
+      fetch(FIREWORK_B64)
         .then(res => res.arrayBuffer())
         .then(ab => this.ctx.decodeAudioData(ab))
         .then(buf => { this.fireworkBuffer = buf; })
-        .catch(e => console.warn('Firework buffer load:', e));
+        .catch(e => console.warn('Firework buffer decode error:', e));
     } catch (e) {}
   }
 
