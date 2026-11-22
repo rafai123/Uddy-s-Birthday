@@ -1,6 +1,75 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ffAudio } from '../audio/retroAudio';
 
+// Komponen Box Loading dari Penuh ke Kosong di bawah Pesan Intro
+function IntroProgressBar({ duration, onComplete, label = "MEMPROSES PESAN..." }) {
+  const [percent, setPercent] = useState(100);
+
+  useEffect(() => {
+    const startTime = Date.now();
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const left = Math.max(0, 100 - (elapsed / duration) * 100);
+      setPercent(left);
+      if (elapsed >= duration) {
+        clearInterval(interval);
+        if (onComplete) onComplete();
+      }
+    }, 30);
+    return () => clearInterval(interval);
+  }, [duration, onComplete]);
+
+  return (
+    <div style={{
+      marginTop: 20,
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center'
+    }}>
+      {/* Box Loading Frame */}
+      <div style={{
+        width: '100%',
+        maxWidth: 320,
+        height: 12,
+        background: 'rgba(2, 6, 23, 0.92)',
+        border: '1.5px solid #fbbf24',
+        borderRadius: 6,
+        padding: 2,
+        position: 'relative',
+        boxShadow: '0 0 12px rgba(251, 191, 36, 0.35), inset 0 0 6px #000',
+        overflow: 'hidden'
+      }}>
+        {/* Fill bar yang menyusut dari 100% penuh ke 0% kosong */}
+        <div style={{
+          height: '100%',
+          width: `${percent}%`,
+          background: 'linear-gradient(90deg, #ec4899, #f59e0b, #fbbf24)',
+          borderRadius: 4,
+          boxShadow: '0 0 8px #fbbf24',
+          transition: 'width 0.05s linear'
+        }} />
+      </div>
+
+      {/* Label proses & countdown */}
+      <div style={{
+        marginTop: 6,
+        width: '100%',
+        maxWidth: 320,
+        display: 'flex',
+        justifyContent: 'space-between',
+        fontFamily: 'var(--font-retro)',
+        fontSize: 8,
+        color: '#fbbf24',
+        letterSpacing: 1
+      }}>
+        <span>⏳ {label}</span>
+        <span>{Math.ceil((percent / 100) * (duration / 1000))}s</span>
+      </div>
+    </div>
+  );
+}
+
 export function OpeningCinematic({ onComplete }) {
   const [step, setStep] = useState(1); // 1: Loading, 2: Fireworks, 3: Reveal, 4: Cake, 5: Transition
   const [candlesBlown, setCandlesBlown] = useState(false);
@@ -9,6 +78,28 @@ export function OpeningCinematic({ onComplete }) {
   const [blownList, setBlownList] = useState([]);
   const canvasRef = useRef(null);
   const particlesRef = useRef([]);
+
+  // Langsung putar musik River Flows in You slow piano saat intro dimuat
+  useEffect(() => {
+    ffAudio.startBGM();
+
+    // Browser policy unlock: pastikan BGM langsung berbunyi saat ada interaksi pertama
+    const unlockBGM = () => {
+      ffAudio.startBGM();
+      ['click', 'touchstart', 'touchend', 'keydown'].forEach(e =>
+        window.removeEventListener(e, unlockBGM)
+      );
+    };
+    ['click', 'touchstart', 'touchend', 'keydown'].forEach(e =>
+      window.addEventListener(e, unlockBGM, { once: true, passive: true })
+    );
+
+    return () => {
+      ['click', 'touchstart', 'touchend', 'keydown'].forEach(e =>
+        window.removeEventListener(e, unlockBGM)
+      );
+    };
+  }, []);
 
   // Loop partikel kembang api & confetti canvas
   useEffect(() => {
@@ -55,39 +146,25 @@ export function OpeningCinematic({ onComplete }) {
     return () => cancelAnimationFrame(animId);
   }, []);
 
-  // Alur otomatis per tahap sinematik
+  // Di tahap kembang api: ledakkan kembang api secara berkala dengan sound effect ledakan
   useEffect(() => {
-    if (step === 1) {
-      const t = setTimeout(() => {
-        setStep(2);
-      }, 3500);
-      return () => clearTimeout(t);
-    } else if (step === 2) {
-      // Pesta kembang api
+    if (step === 2) {
       let count = 0;
+      // Langsung ledakkan kembang api pertama
+      spawnFirework();
+      ffAudio.playFirework();
+
       const interval = setInterval(() => {
-        if (count > 7) {
+        if (count >= 8) {
           clearInterval(interval);
           return;
         }
         spawnFirework();
         ffAudio.playFirework();
         count++;
-      }, 450);
+      }, 550);
 
-      const t = setTimeout(() => {
-        setStep(3);
-      }, 4800);
-      return () => {
-        clearInterval(interval);
-        clearTimeout(t);
-      };
-    } else if (step === 3) {
-      ffAudio.playCrystalFanfare();
-      const t = setTimeout(() => {
-        setStep(4);
-      }, 4000);
-      return () => clearTimeout(t);
+      return () => clearInterval(interval);
     }
   }, [step]);
 
@@ -99,9 +176,9 @@ export function OpeningCinematic({ onComplete }) {
     const colors = ['#f43f5e', '#fbbf24', '#38bdf8', '#ec4899', '#a855f7', '#ffffff'];
     const color = colors[Math.floor(Math.random() * colors.length)];
 
-    for (let i = 0; i < 45; i++) {
-      const angle = (Math.PI * 2 * i) / 45;
-      const speed = Math.random() * 5 + 2;
+    for (let i = 0; i < 48; i++) {
+      const angle = (Math.PI * 2 * i) / 48;
+      const speed = Math.random() * 5.5 + 2;
       particlesRef.current.push({
         x, y,
         vx: Math.cos(angle) * speed,
@@ -110,7 +187,7 @@ export function OpeningCinematic({ onComplete }) {
         alpha: 1.0,
         decay: Math.random() * 0.02 + 0.015,
         size: Math.random() * 3 + 2,
-        isHeart: Math.random() < 0.2
+        isHeart: Math.random() < 0.25
       });
     }
   };
@@ -193,19 +270,25 @@ export function OpeningCinematic({ onComplete }) {
 
       {/* 01. Romantic Loading */}
       {step === 1 && (
-        <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: 20 }}>
+        <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: 20, maxWidth: 400, width: '90%' }}>
           <div style={{ fontSize: 64, marginBottom: 20, animation: 'pulseBeat 1.2s infinite alternate' }}>
             💖
           </div>
-          <p style={{ fontFamily: 'var(--font-retro)', fontSize: 11, color: '#93c5fd', lineHeight: 1.8, maxWidth: 360 }}>
+          <p style={{ fontFamily: 'var(--font-retro)', fontSize: 11, color: '#93c5fd', lineHeight: 1.8 }}>
             Tunggu bentar, masih loading ya udyy sayang...
           </p>
+          {/* Box loading dari penuh ke kosong */}
+          <IntroProgressBar
+            duration={3600}
+            onComplete={() => setStep(2)}
+            label="MEMPROSES..."
+          />
         </div>
       )}
 
       {/* 02. Fireworks Celebration */}
       {step === 2 && (
-        <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '0 16px' }}>
+        <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '0 16px', maxWidth: 440, width: '90%' }}>
           <h2 style={{
             fontFamily: 'var(--font-retro)',
             fontSize: 'clamp(13px, 4.2vw, 19px)',
@@ -219,6 +302,12 @@ export function OpeningCinematic({ onComplete }) {
           <p style={{ fontFamily: 'var(--font-retro)', fontSize: 'clamp(10px, 3.2vw, 13px)', color: '#f472b6', letterSpacing: 1 }}>
             SELAMAT MAKINN TUA WKWK 😜
           </p>
+          {/* Box loading dari penuh ke kosong */}
+          <IntroProgressBar
+            duration={5200}
+            onComplete={() => setStep(3)}
+            label="MEMPROSES PESAN..."
+          />
         </div>
       )}
 
@@ -235,6 +324,12 @@ export function OpeningCinematic({ onComplete }) {
           <div style={{ fontFamily: 'var(--font-retro)', fontSize: 11, color: '#fbbf24', letterSpacing: 2 }}>
             26 NOVEMBER 2026
           </div>
+          {/* Box loading dari penuh ke kosong */}
+          <IntroProgressBar
+            duration={6200}
+            onComplete={() => setStep(4)}
+            label="MEMPROSES PESAN..."
+          />
         </div>
       )}
 
@@ -297,6 +392,12 @@ export function OpeningCinematic({ onComplete }) {
               <button onClick={handleProceedToWorld} className="ff-btn gold">
                 JELAJAHI DUNIA KITA ✨
               </button>
+              {/* Box loading dari penuh ke kosong */}
+              <IntroProgressBar
+                duration={8500}
+                onComplete={handleProceedToWorld}
+                label="MENUJU DUNIA KITA..."
+              />
             </div>
           )}
         </div>

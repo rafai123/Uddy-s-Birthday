@@ -111,13 +111,14 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
     }
     ctx.drawImage(tileEngine.props.boat, 10 * T - 10, 14 * T);
 
-    // 4. Gunung Sinabung Statis
+    // 4. Gunung Sinabung Megah (Batu Vulkanik Alami & Salju Dingin)
     const mtBaseX = 280;
     const mtBaseY = 740;
     const mtPeakX = 260;
     const mtPeakY = 480;
 
-    ctx.fillStyle = '#0f172a';
+    // Bayangan gunung batu gelap
+    ctx.fillStyle = '#161e2e';
     ctx.beginPath();
     ctx.moveTo(60, mtBaseY);
     ctx.lineTo(mtPeakX, mtPeakY);
@@ -125,7 +126,8 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
     ctx.closePath();
     ctx.fill();
 
-    ctx.fillStyle = '#1e293b';
+    // Sisi kiri gunung batu
+    ctx.fillStyle = '#242f44';
     ctx.beginPath();
     ctx.moveTo(80, mtBaseY);
     ctx.lineTo(mtPeakX, mtPeakY + 4);
@@ -133,7 +135,8 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
     ctx.closePath();
     ctx.fill();
 
-    ctx.fillStyle = '#334155';
+    // Faset cadas tersorot cahaya rembulan
+    ctx.fillStyle = '#374763';
     ctx.beginPath();
     ctx.moveTo(mtPeakX, mtPeakY + 4);
     ctx.lineTo(mtPeakX - 60, mtBaseY);
@@ -141,11 +144,21 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
     ctx.closePath();
     ctx.fill();
 
+    // Salju puncak putih bersih
     ctx.fillStyle = '#e2e8f0';
     ctx.beginPath();
     ctx.moveTo(mtPeakX - 25, mtPeakY + 28);
     ctx.lineTo(mtPeakX, mtPeakY);
     ctx.lineTo(mtPeakX + 30, mtPeakY + 32);
+    ctx.closePath();
+    ctx.fill();
+
+    // Kilau es puncak salju
+    ctx.fillStyle = '#f8fafc';
+    ctx.beginPath();
+    ctx.moveTo(mtPeakX - 10, mtPeakY + 10);
+    ctx.lineTo(mtPeakX, mtPeakY);
+    ctx.lineTo(mtPeakX + 15, mtPeakY + 15);
     ctx.closePath();
     ctx.fill();
 
@@ -176,7 +189,7 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
     for (let c = 15; c <= 25; c++) {
       for (let r = 35; r <= 39; r++) {
         ctx.drawImage(tileEngine.tiles.grass2, c * T, r * T);
-        ctx.strokeStyle = '#14532d';
+        ctx.strokeStyle = '#295424';
         ctx.lineWidth = 2;
         ctx.strokeRect(c * T, r * T, T, T);
       }
@@ -211,16 +224,18 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
   // Inisialisasi partikel ambient
   useEffect(() => {
     const particles = [];
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 60; i++) {
+      const types = ['firefly', 'firefly', 'star', 'star', 'petal'];
       particles.push({
         x: Math.random() * 1344,
         y: Math.random() * 1728,
-        vx: (Math.random() - 0.5) * 0.4 + 0.2,
-        vy: Math.random() * 0.4 + 0.2,
-        size: Math.random() * 2.5 + 1.5,
-        alpha: Math.random() * 0.7 + 0.3,
+        vx: (Math.random() - 0.5) * 0.35 + 0.1,
+        vy: Math.random() * 0.35 + 0.1,
+        size: Math.random() * 2.8 + 1.4,
+        alpha: Math.random() * 0.75 + 0.25,
         pulse: Math.random() * Math.PI * 2,
-        type: Math.random() < 0.5 ? 'petal' : (Math.random() < 0.8 ? 'firefly' : 'heart')
+        type: types[Math.floor(Math.random() * types.length)],
+        color: ['#fef08a', '#fde047', '#e0f2fe', '#bae6fd', '#fce7f3'][Math.floor(Math.random() * 5)]
       });
     }
     stateRef.current.ambientParticles = particles;
@@ -385,7 +400,14 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
       // RENDER CEPAT 60 FPS VIA OFFSCREEN CANVAS
       // ==========================================
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#050a16';
+
+      // Background gradient langit malam atmosferik (serasi dengan intro gelap malam)
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      skyGrad.addColorStop(0, '#040714');   // Langit malam pekat berbintang
+      skyGrad.addColorStop(0.35, '#0a1128'); // Midnight navy
+      skyGrad.addColorStop(0.7, '#111c38');  // Deep sapphire
+      skyGrad.addColorStop(1, '#1b2a4a');   // Horizon remang malam
+      ctx.fillStyle = skyGrad;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.save();
@@ -398,22 +420,29 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
         ctx.drawImage(s.terrainCanvas, 0, 0);
       }
 
-      // B. Elemen Dinamis: Ombak Animasi Pantai
-      ctx.fillStyle = '#ffffff';
+      // B. Elemen Dinamis: Ombak Animasi Pantai Rembulan
       for (let r = 4; r <= 20; r += 3) {
         const cx = 25 * T + (r * 0.8) * T + Math.sin(s.tick * 0.07 + r) * 6;
         const cy = r * T;
-        ctx.fillRect(cx, cy, 24, 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${0.45 + Math.sin(s.tick * 0.07 + r) * 0.2})`;
+        ctx.fillRect(cx, cy, 28, 2);
+        // Shimmer biru rembulan bawah ombak
+        ctx.fillStyle = 'rgba(147, 197, 253, 0.35)';
+        ctx.fillRect(cx + 2, cy + 2, 20, 1);
       }
 
-      // C. Elemen Dinamis: Kepulan Kabut Kawah Gunung Sinabung
+      // C. Elemen Dinamis: Kabut Malam Lembut di Puncak Gunung
       const mtPeakX = 260;
       const mtPeakY = 480;
       const smokeDrift = Math.sin(s.tick * 0.04) * 8;
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.42)';
+      ctx.fillStyle = 'rgba(226, 232, 240, 0.4)';
       ctx.beginPath();
-      ctx.arc(mtPeakX + smokeDrift, mtPeakY - 14, 16, 0, Math.PI * 2);
-      ctx.arc(mtPeakX + smokeDrift + 14, mtPeakY - 26, 22, 0, Math.PI * 2);
+      ctx.arc(mtPeakX + smokeDrift, mtPeakY - 14, 18, 0, Math.PI * 2);
+      ctx.arc(mtPeakX + smokeDrift + 16, mtPeakY - 26, 24, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(241, 245, 249, 0.3)';
+      ctx.beginPath();
+      ctx.arc(mtPeakX + smokeDrift - 8, mtPeakY - 20, 12, 0, Math.PI * 2);
       ctx.fill();
 
       // D. Elemen Dinamis: Baling-Baling Kincir Angin Tongging Berputar
@@ -478,38 +507,49 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
         ctx.shadowBlur = 0;
       });
 
-      // F. Area Rahasia: Our Little Universe (Pulau Kosmik Terapung)
+      // F. Area Rahasia: Our Little Universe (Pulau Kosmik Malam Berbintang)
       const secX = SECRET_AREA.coords.x;
       const secY = SECRET_AREA.coords.y;
       const secPulse = Math.sin(s.tick * 0.06) * 10;
+      // Aura kosmik rembulan malam
       const sGrad = ctx.createRadialGradient(secX, secY, 20, secX, secY, 130 + secPulse);
-      sGrad.addColorStop(0, isSecretUnlocked ? 'rgba(236, 72, 153, 0.7)' : 'rgba(88, 28, 135, 0.5)');
+      sGrad.addColorStop(0, isSecretUnlocked ? 'rgba(56, 189, 248, 0.75)' : 'rgba(99, 102, 241, 0.5)');
+      sGrad.addColorStop(0.5, isSecretUnlocked ? 'rgba(99, 102, 241, 0.4)' : 'rgba(49, 46, 129, 0.3)');
       sGrad.addColorStop(1, 'transparent');
       ctx.fillStyle = sGrad;
       ctx.beginPath();
       ctx.arc(secX, secY, 130 + secPulse, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = '#1e1b4b';
+      // Pulau Terapung Kosmik Malam
+      ctx.fillStyle = '#0f172a';
       ctx.beginPath();
       ctx.ellipse(secX, secY, 110, 55, 0, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#312e81';
+      ctx.fillStyle = '#1e293b';
       ctx.beginPath();
       ctx.ellipse(secX, secY - 5, 95, 45, 0, 0, Math.PI * 2);
       ctx.fill();
+      // Kilau nebula biru malam
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+      ctx.beginPath();
+      ctx.ellipse(secX, secY - 8, 72, 32, 0, 0, Math.PI * 2);
+      ctx.fill();
 
       if (isSecretUnlocked) {
-        ctx.fillStyle = '#fbbf24';
+        ctx.fillStyle = '#fde68a';
         ctx.font = "bold 11px 'Press Start 2P', monospace";
         ctx.textAlign = 'center';
+        ctx.shadowColor = '#38bdf8';
+        ctx.shadowBlur = 10;
         ctx.fillText('✨ TERBUKA! ✨', secX, secY + 30);
+        ctx.shadowBlur = 0;
       } else {
         ctx.font = '24px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('🔒', secX, secY - 14);
         ctx.font = "8px 'Press Start 2P', monospace";
-        ctx.fillStyle = '#f43f5e';
+        ctx.fillStyle = '#f9a8d4';
         ctx.fillText('TERKUNCI', secX, secY + 22);
       }
 
@@ -541,25 +581,34 @@ export function GameWorld({ visitedList, isSecretUnlocked, onNearLocation, onLea
       ctx.fillText('Udy ❤️', p.x, p.y - 38);
       ctx.shadowBlur = 0;
 
-      // I. Partikel Ambient (Kelopak Sakura, Hati, Kunang-kunang)
+      // I. Partikel Ambient (Kelopak Sakura, Hati, Kunang-kunang, Bintang)
       for (const pt of s.ambientParticles) {
         ctx.save();
-        ctx.globalAlpha = Math.max(0.1, Math.min(1, pt.alpha));
+        ctx.globalAlpha = Math.max(0.1, Math.min(1, Math.abs(Math.sin(pt.pulse * 0.5)) * pt.alpha + 0.1));
         if (pt.type === 'petal') {
-          ctx.fillStyle = '#fbcfe8';
+          ctx.fillStyle = pt.color || '#fbcfe8';
           ctx.beginPath();
           ctx.ellipse(pt.x, pt.y, pt.size, pt.size * 0.6, pt.pulse, 0, Math.PI * 2);
           ctx.fill();
         } else if (pt.type === 'heart') {
-          ctx.fillStyle = '#f43f5e';
-          ctx.font = `${Math.floor(pt.size * 2.5)}px sans-serif`;
+          ctx.fillStyle = pt.color || '#f472b6';
+          ctx.font = `${Math.floor(pt.size * 2.8)}px sans-serif`;
           ctx.textAlign = 'center';
           ctx.fillText('♥', pt.x, pt.y);
+        } else if (pt.type === 'star') {
+          ctx.fillStyle = pt.color || '#fde68a';
+          ctx.font = `${Math.floor(pt.size * 2.5)}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillText('✦', pt.x, pt.y);
         } else {
-          ctx.fillStyle = '#fef08a';
+          // firefly — kunang-kunang bersinar
+          ctx.fillStyle = pt.color || '#fef08a';
+          ctx.shadowColor = pt.color || '#fef08a';
+          ctx.shadowBlur = 6;
           ctx.beginPath();
-          ctx.arc(pt.x, pt.y, pt.size * 0.8, 0, Math.PI * 2);
+          ctx.arc(pt.x, pt.y, pt.size * 0.9, 0, Math.PI * 2);
           ctx.fill();
+          ctx.shadowBlur = 0;
         }
         ctx.restore();
       }

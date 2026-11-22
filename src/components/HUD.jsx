@@ -44,19 +44,11 @@ export function HUD({ visitedList, isMuted, onToggleMute, onOpenJournal }) {
 
       {/* Tombol Aksi Cepat */}
       <div className="ff-hud-actions">
-        <button
-          onClick={() => {
-            onToggleMute();
-          }}
-          className="ff-hud-btn"
-        >
+        <button onClick={onToggleMute} className="ff-hud-btn">
           {isMuted ? '🔇 Off' : '🎵 On'}
         </button>
         <button
-          onClick={() => {
-            ffAudio.playCursorMove();
-            onOpenJournal();
-          }}
+          onClick={() => { ffAudio.playCursorMove(); onOpenJournal(); }}
           className="ff-hud-btn"
         >
           📖 Jurnal
